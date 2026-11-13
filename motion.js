@@ -175,6 +175,15 @@ float occAt(vec2 uv, vec4 m, float w) {   // coverage of the channel m, blurred 
 float liftedH(vec2 uv, out float near) {  // mean height of the lifted top sheet around here (0 when none)
   vec4 s = texture(uS4, uv); near = smoothstep(0.0, 0.06, s.b);
   return s.b > 0.002 ? s.a / s.b * 900.0 + ZT : 0.0;
+}
+// The lifted sheet's own shadow, read from the widest level alone, so its soft edge fades out by itself. (Its tail must
+// not depend on liftedH's near: past near's reach the penumbra fell back to the sharp level and cut the tail off straight.)
+float liftK(float dh) { return 0.36 - 0.25 * smoothstep(10.0, 220.0, dh); }
+float liftedOcc(vec2 uv, float z, float k, out float dhL) {
+  vec4 s = texture(uS5, uv); dhL = 0.0;
+  if (s.b < 0.0005) return 0.0;
+  dhL = max(s.a / s.b * 900.0 + ZT - z, 0.5);
+  return occAt(uv, vec4(0, 0, 1, 0), max(0.35 + dhL * 0.2, 1.4) * k);
 }`;
 
 const FS = HEAD + `
@@ -240,7 +249,9 @@ void main() {
     if (a < 0.5) discard;
     float z = vW.z;
     bool lifted = uKind == 5 && z > ZT + 1.0;
-    o = vec4(1.0, step(ZG + 0.35, z), lifted ? 1.0 : 0.0, lifted ? clamp((z - ZT) / 900.0, 0.0, 1.0) : 0.0);
+    // r, g: the casters that stay on the pad (any; above the copy). The lifted sheet goes only in b and a, and its shadow
+    // is drawn on its own from the widest level (liftedOcc), so it fades out by itself with no edge where liftedH's reach ends.
+    o = vec4(lifted ? 0.0 : 1.0, lifted ? 0.0 : step(ZG + 0.35, z), lifted ? 1.0 : 0.0, lifted ? clamp((z - ZT) / 900.0, 0.0, 1.0) : 0.0);
     return;
   }
   // ---- surface normal
@@ -294,18 +305,20 @@ void main() {
   float wrapK = (uKind == 5 && uFly > 0.5) ? 0.4 : 0.0;   // thin paper: light wraps a little round a bend
   float key = max(dot(Np, Lv) + wrapK, 0.0) / (Lv.z + wrapK);
   key = key / (1.0 + 0.45 * max(key - 1.0, 0.0));   // what faces the low light gets brighter than the flat, but not blown out
-  float sh = 1.0;
+  float sh = 1.0, oLk = 0.0;
   if (uShade > 0.5) {
     vec2 spx = uView.xy + (vW.xy + vW.z * uShv) * uView.z;
     vec2 suv = vec2(spx.x / uCanvas.x, 1.0 - spx.y / uCanvas.y);
     float near; float hl = liftedH(suv, near);
     float z = vW.z;
     vec4 ch = (uKind <= 2) ? vec4(0, 1, 0, 0) : vec4(0, 0, 1, 0);
+    if (uKind <= 2) near = 0.0;   // g holds only the casters that stay on the pad; the lifted sheet comes from liftedOcc
     float dh = mix(max(ZB - z, 0.5), max(hl - z, 0.5), near);
     float w = max(0.35 + dh * (near > 0.5 ? 0.2 : 0.11), 1.4) * uView.z;
     float occ = occAt(suv, ch, w);
     if (uKind == 5 && z > ZT + 1.0) occ *= smoothstep(z + 8.0, z + 40.0, hl);   // only what stands higher than this point
     sh = 1.0 - occ * (uKind <= 2 && near < 0.5 ? 0.42 : 0.36 - 0.25 * smoothstep(10.0, 220.0, dh));   // a high caster: wider, fainter
+    if (!(uKind == 5 && z > ZT + 1.0)) { float dhL; float oL = liftedOcc(suv, z, uView.z, dhL); oLk = oL * liftK(dhL); if (uKind > 1) sh = min(sh, 1.0 - oLk); }
   }
   float amb = (uKind == 5 && uFly < 0.5 ? 0.36 : 0.42) + 0.08 * Nf.z;   // the roll: deeper form shading                        // sky fill: what faces up gets a little more
   float keyF = max(dot(N, Lv), 0.0) / Lv.z;              // the light on the printed face
@@ -334,7 +347,7 @@ void main() {
     vec2 uv0 = vec2(p0.x / uCanvas.x, 1.0 - p0.y / uCanvas.y);
     lit *= 1.0 - 0.14 * texture(uS2, uv0).b - 0.07 * texture(uS3, uv0).b;
   }
-  if (uKind <= 1) lit *= uLift;   // the edges of the earlier sheets sit in the stack's own shade
+  if (uKind <= 1) lit *= uLift * (1.0 - oLk);   // the board's and the stack's thin edges darken with the ground beside them   // the edges of the earlier sheets sit in the stack's own shade
   if (uKind == 1 || uKind == 2) {   // each sheet's bottom and right edge: a fine dark gap under it, a lit lip just inside
     float dE = min(uRect.w - v, uRect.y - u), px = max(fwidth(v) + fwidth(u), 0.08);
     float gap = 1.0 - smoothstep(0.0, 0.45 + px, dE);
@@ -370,12 +383,14 @@ ${SHADOW_FN}
 float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 void main() {
   vec2 suv = gl_FragCoord.xy / (uCanvas * uDpr);
-  float near; float hl = liftedH(suv, near);
-  float dh = mix(ZB, hl, near);
-  float w = max(0.35 + dh * (near > 0.5 ? 0.2 : 0.11), 1.4) * uK;
+  // r holds only the casters that stay on the pad (board, stack, binding): their shadow is always the low, crisp one
+  float dh = ZB;
+  float w = max(0.35 + dh * 0.11, 1.4) * uK;
   float occ = occAt(suv, vec4(1, 0, 0, 0), w);
   float ao = texture(uS4, suv).r;
   float dark = occ * (0.40 - 0.26 * smoothstep(4.0, 60.0, dh) - 0.06 * smoothstep(60.0, 320.0, dh)) + ao * 0.07;
+  float dhL; float oL = liftedOcc(suv, 0.0, uK, dhL);
+  dark = max(dark, oL * liftK(dhL));   // the same strength as on the pad, so the shadow has no step at the pad's edge
   dark += uDith * (hash(gl_FragCoord.xy) - 0.5) / 255.0;
   o = vec4(0.0, 0.0, 0.0, clamp(dark, 0.0, 1.0));
 }`;
