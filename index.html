@@ -3,264 +3,248 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kepthold</title>
-<meta name="description" content="Kepthold copies your invoices, bookings and payroll to a small computer in your office every night. When an app goes down, ask the copy.">
-<link rel="icon" href="mark.svg" type="image/svg+xml">
+<title>Kepthold: your business records, on a computer you own</title>
+<meta name="description" content="For owners who run a business on rented apps. Kepthold copies your invoices, bookings and payroll to a small computer in your office every night, and answers questions in plain words. It works today on made-up sample records.">
 <link rel="canonical" href="https://www.kepthold.com/">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://www.kepthold.com/">
-<meta property="og:title" content="Kepthold. Own the copy.">
-<meta property="og:description" content="Your software is down. Your answers aren't.">
-<meta property="og:image" content="https://www.kepthold.com/assets/og.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preload" href="fonts/besley-sub.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/schibsted-sub.woff2" as="font" type="font/woff2" crossorigin>
-<script>
-/* Before first paint: decide whether the live scene may run, so the pinned layout never shifts later. */
-(function () {
-  var d = document.documentElement, q = location.search;
-  d.classList.add('js');
-  try {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { d.classList.add('rm', 'still'); return; }
-    if (/[?&]nogl/.test(q)) { d.classList.add('still'); return; }
-    var c = document.createElement('canvas'), g = c.getContext('webgl2');
-    if (g) { d.classList.add('gl'); var x = g.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); }
-    else d.classList.add('still');
-  } catch (e) { d.classList.add('still'); }
-})();
-</script>
-<style>
-@font-face { font-family: "Besley"; src: url("fonts/besley-sub.woff2") format("woff2"); font-weight: 400 900; font-display: swap; ascent-override: 90%; descent-override: 22%; }
-@font-face { font-family: "Schibsted Grotesk"; src: url("fonts/schibsted-sub.woff2") format("woff2"); font-weight: 400 900; font-display: swap; }
-@font-face { font-family: "Besley Fallback"; src: local("Georgia"), local("Times New Roman"); size-adjust: 103%; ascent-override: 90%; descent-override: 22%; }
-@font-face { font-family: "Schibsted Fallback"; src: local("Arial"), local("Helvetica Neue"); size-adjust: 98%; ascent-override: 96%; descent-override: 26%; }
-
-:root {
-  --ground: #ECEDE8;
-  --far: rgba(23, 25, 22, .065);     /* the ground beyond the key light's pool: the hero's far side, the lower page, the footer */
-  --ink: #16181D;
-  --kept-deep: #1E4A3A;
-  --down: #474C52;
-  --muted: #3C433F;
-  --pencil: #4A4F4A;
-  --vermilion: #C8321E;
-  --serif: "Besley", "Besley Fallback", Georgia, serif;
-  --sans: "Schibsted Grotesk", "Schibsted Fallback", Arial, sans-serif;
-  color-scheme: light;
-}
-* { box-sizing: border-box; }
-html { background: var(--ground) url("assets/ground.webp") 0 0 / 512px 512px; }
-body { margin: 0; color: var(--ink); font: 400 16px/24px var(--sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-h1, p, figure { margin: 0; padding: 0; }
-a { color: inherit; }
-.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-
-/* ---------- first screen ---------- */
-.hero { position: relative; overflow: hidden; height: 100svh; background: var(--ground) url("assets/ground.webp") 0 0 / 512px 512px; }
-.frame { position: relative; z-index: 2; }
-.brand { display: flex; align-items: baseline; gap: 14px; }
-.brand svg { width: 22px; height: 22px; flex: none; align-self: center; }
-.brand .name { font: 600 22px/32px var(--serif); letter-spacing: -.005em; }
-.brand .line { font: 500 16px/32px var(--sans); color: var(--muted); }
-.mark-fill { fill: var(--kept-deep); }
-h1 { font-family: var(--serif); font-weight: 600; letter-spacing: -.02em; }
-h1 span { display: block; text-wrap: balance; }
-h1 .down { color: var(--down); }
-h1 .up { color: var(--kept-deep); }
-.support { color: var(--muted); text-wrap: pretty; }
-.acts { display: flex; align-items: center; }
-/* red is the alarm on the sheet and nothing else: the action is the kept green */
-.act { display: inline-flex; align-items: center; height: 48px; padding: 0 24px; border-radius: 2px; cursor: pointer;
-  background: var(--kept-deep); color: #F3F7F4; font: 600 16px/48px var(--sans); text-decoration: none; letter-spacing: .005em; white-space: nowrap; }
-.act:hover { background: #163A2D; }
-.act:focus-visible, .undo:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
-.after { display: inline-flex; align-items: center; gap: 20px; }
-.undo { font: 400 15px/24px var(--sans); color: var(--muted); text-underline-offset: 3px; text-decoration-thickness: 1px; white-space: nowrap; }
-.undo:hover { color: var(--ink); }
-.addr { position: absolute; left: 0; top: calc(100% + 14px); font: 400 15px/20px var(--sans); color: var(--muted); white-space: nowrap; letter-spacing: .005em; }
-.act[hidden], .after[hidden] { display: none; }
-html:not(.js) .hero:target .act.tear { display: none; }
-html:not(.js) .hero:target .after { display: inline-flex; }
-
-/* the pad: #padbox covers the book exactly (binding top to board bottom); everything else is placed from it */
-.padbox { position: absolute; aspect-ratio: 526 / 682; }
-/* one key light, upper left of the pad: the ground's pool is centred there and is flat (--far) beyond 0.75 of its radius.
-   The same ellipse lights the paper in motion.js (POOL). */
-.pool { position: absolute; left: -400%; top: -400%; width: 900%; height: 900%; pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse 24.4444% 18.8530% at 43.1111% 43.3333%, rgba(23,25,22,0) 0%, rgba(23,25,22,.015) 35%, var(--far) 75%, var(--far) 100%); }
-.poster, .revealed { position: absolute; left: -9.5057%; top: -5.8651%; width: 126.616%; height: 120.528%; z-index: 1; }
-.poster, .revealed { pointer-events: none; }
-.acts { position: relative; z-index: 4; }
-.poster img { width: 100%; height: 100%; display: block; }
-.revealed { opacity: 0; background: center / 100% 100% no-repeat; }
-@media (min-width: 1024px) { html:not(.gl).is-torn .revealed, html:not(.js) .hero:target .revealed { background-image: url("assets/poster-desk-torn.webp"); } }
-@media (max-width: 1023px) { html:not(.gl).is-torn .revealed, html:not(.js) .hero:target .revealed { background-image: url("assets/poster-phone-torn.webp"); } }
-html:not(.gl).is-torn .revealed, html:not(.js) .hero:target .revealed { opacity: 1; }
-html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: hidden; }
-.live .poster, .live .revealed { visibility: hidden; }
-.gl-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; pointer-events: none; }
-.handle { position: absolute; width: 104px; height: 104px; left: calc(99.43% - 78px); top: calc(97.95% - 78px); z-index: 3; display: none;
-  touch-action: pan-y; cursor: grab; -webkit-tap-highlight-color: transparent; }
-.live .handle { display: block; }
-.handle.held { cursor: grabbing; }
-/* a pencilled note on the ground beside the corner */
-.note { position: absolute; z-index: 3; right: 0; top: calc(100% + 12px); font: 400 16px/20px var(--sans); color: var(--pencil);
-  white-space: nowrap; pointer-events: none; transition: opacity .2s linear; letter-spacing: .005em; }
-.still .note, html:not(.js) .note { display: none; }
-.flat .pin { height: auto !important; }
-.flat .hero { position: relative !important; }
-
-/* ================= desktop: one composition on a 1440 x 900 grid ================= */
-@media (min-width: 1024px) {
-  :root { --u: min(calc(100vw / 1440), calc(100svh / 900)); }
-  .hero { min-height: 560px; display: grid; place-items: center; }
-  .gl .pin { height: 230svh; }
-  .gl .hero { position: sticky; top: 0; }
-  .frame { width: calc(1440 * var(--u)); height: calc(900 * var(--u)); }
-  .hero .brand { position: absolute; left: calc(96 * var(--u)); top: calc(36 * var(--u)); }
-  /* the words are one block, set against the pad's middle: headline, 48 under it the sentence, then the action */
-  .words { position: absolute; left: calc(96 * var(--u)); top: calc(222 * var(--u)); width: calc(672 * var(--u)); }
-  h1 { font-size: calc(64 * var(--u)); line-height: calc(74 * var(--u)); }
-  .support { margin-top: calc(36 * var(--u)); width: calc(470 * var(--u));
-    font-size: max(17px, calc(19 * var(--u))); line-height: max(26px, calc(29 * var(--u))); }
-  .acts { margin-top: calc(40 * var(--u)); }
-  .padbox { left: calc(784 * var(--u)); top: calc(84 * var(--u)); width: calc(560 * var(--u)); }
-}
-
-/* ================= phone and narrow: words, the pad, then the action under the thumb ================= */
-@media (max-width: 1023px) {
-  .hero { min-height: 560px; display: flex; flex-direction: column; }
-  .gl .pin { height: 220svh; }
-  .gl .hero { position: sticky; top: 0; }
-  .frame { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; padding: 16px 16px 44px; }
-  .brand .name { font-size: 21px; }
-  h1 { margin-top: 20px; font-size: min(32px, 8.4vw); line-height: 1.12; }
-  .support { margin-top: 12px; font-size: 15px; line-height: 21px; max-width: 34em; }
-  .words { display: contents; }
-  .stage { position: relative; flex: 0 1 auto; aspect-ratio: 526 / 682; min-height: 0; margin-top: 16px; container-type: size; order: 4; }
-  .acts { order: 5; }
-  .padbox { left: 0; top: 0; width: min(100cqw, 100cqh * 0.77126); }
-  .acts { margin-top: 18px; min-height: 46px; }
-  .act { height: 46px; line-height: 46px; padding: 0 20px; }
-  .after { gap: 16px; }
-  .note { top: calc(100% + 29px); }
-}
-
-/* ---------- below: two earlier leaves torn from the same pad, at the pad's own scale and on the hero's grid ---------- */
-.days { position: relative; background: var(--far); overflow-x: clip; }
-.sheets { position: relative; margin: 0 auto; }
-.sheets figure { position: relative; flex: none; }
-.sheets img { display: block; width: 100%; height: auto; aspect-ratio: 1160 / 1400; }
-html:not(.js) .sheets picture { display: none; }   /* without JavaScript the noscript copy shows instead */
-footer { background: var(--far); color: var(--muted); font: 400 16px/24px var(--sans); }
-footer .in { border-top: 1px solid rgba(23,25,22,.16); display: grid; align-items: baseline; }
-footer .brand .name { font-size: 19px; color: var(--ink); }
-footer .built { color: var(--ink); max-width: 30em; text-wrap: pretty; }
-footer .mail { color: var(--kept-deep); font-weight: 600; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-footer .mail:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-footer .sample { color: var(--pencil); font-size: 14px; }
-@media (min-width: 1024px) {
-  .days { padding: calc(24 * var(--u)) 0 calc(80 * var(--u)); }
-  .sheets { width: calc(1440 * var(--u)); height: calc(830 * var(--u)); }
-  .sheets figure { position: absolute; width: calc(580 * var(--u)); }
-  .sheets .d17 { left: calc(721 * var(--u)); top: 0; transform: rotate(.5deg); }
-  .sheets .d16 { left: calc(34 * var(--u)); top: calc(120 * var(--u)); transform: rotate(-.7deg); }
-  footer .in { width: calc(1312 * var(--u)); margin: 0 auto; padding: 32px 0 48px;
-    grid-template-columns: calc(687 * var(--u)) 1fr; grid-template-rows: auto auto; row-gap: 8px; }
-  footer .brand { grid-column: 1; grid-row: 1; }
-  footer .built { grid-column: 1; grid-row: 2; }
-  footer .sample { grid-column: 1; grid-row: 3; }
-}
-@media (max-width: 1023px) {
-  .days { padding: 20px 16px 40px; }
-  .sheets { max-width: 568px; --sw: min(100vw - 32px, 568px); }
-  .sheets figure { width: calc(var(--sw) * 580 / 520); margin-left: calc(var(--sw) * -30 / 520); }
-  .sheets .d17 { transform: rotate(.6deg); }
-  .sheets .d16 { margin-top: calc(var(--sw) * -24 / 520); transform: rotate(-.8deg); }
-  footer .in { margin: 0 16px; padding: 24px 0 36px; grid-template-columns: 1fr; row-gap: 8px; }
-}
-</style>
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<meta name="color-scheme" content="light">
+<link rel="preload" href="fonts/Besley-VF.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SchibstedGrotesk-VF.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="site.css">
+<script>document.documentElement.className='js';</script>
 </head>
-<body id="top">
-<div class="pin">
-<header class="hero" id="copy">
-  <div class="frame">
-    <div class="brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><path class="mark-fill" d="M7 3H27V5.6A3 3 0 0 0 27 11.6V13A3 3 0 0 0 27 19V20.4A3 3 0 0 0 27 26.4V29H7A3 3 0 0 1 4 26V6A3 3 0 0 1 7 3Z"/></svg>
-      <span class="name">Kepthold</span><span class="line">Own the copy.</span>
+<body>
+<svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
+  <symbol id="box" viewBox="0 0 120 84">
+    <rect x="10" y="8" width="100" height="62" rx="5" fill="#1E4A3A"/>
+    <rect x="22" y="20" width="3" height="18" rx="1.5" fill="#3F7560"/>
+    <rect x="30" y="20" width="3" height="18" rx="1.5" fill="#3F7560"/>
+    <rect x="38" y="20" width="3" height="18" rx="1.5" fill="#3F7560"/>
+    <rect x="46" y="20" width="3" height="18" rx="1.5" fill="#3F7560"/>
+    <circle cx="96" cy="56" r="4.5" fill="#9FD3B4"/>
+    <rect x="0" y="74" width="120" height="6" rx="1.5" fill="#16181D"/>
+    <rect x="20" y="70" width="12" height="4" fill="#16181D"/>
+    <rect x="88" y="70" width="12" height="4" fill="#16181D"/>
+  </symbol>
+  <symbol id="arrow" viewBox="0 0 64 16">
+    <path d="M2 8h54" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 6" fill="none"/>
+    <path d="M52 2l8 6-8 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+  <symbol id="lock" viewBox="0 0 24 24">
+    <rect x="4" y="10" width="16" height="12" rx="2" fill="currentColor"/>
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/>
+  </symbol>
+  <symbol id="moon" viewBox="0 0 24 24">
+    <path d="M15.5 3.5a8.5 8.5 0 1 0 5 15.2A9 9 0 0 1 15.5 3.5z" fill="currentColor"/>
+  </symbol>
+  <symbol id="tick" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="11" fill="#1E4A3A"/>
+    <path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
+<header class="top wrap">
+  <a class="brand" href="#top" aria-label="Kepthold, top of page"><img src="assets/mark.svg" width="28" height="28" alt=""><span>Kepthold</span></a>
+  <a class="toplink" href="#try">Try it</a>
+</header>
+
+<main id="top">
+
+<section class="hero wrap" aria-labelledby="h-hero">
+  <p class="for">For owners who run a business on rented apps</p>
+  <h1 id="h-hero">Your business<br class="pb"> records, on a<br class="pb"> computer you own.</h1>
+  <div class="hero-row">
+    <div class="hero-text">
+      <p class="support">Kepthold copies your invoices, bookings and payroll from the apps you rent to a small computer in your office, every night. Ask it a question in plain words. It still answers when an app is down.</p>
+      <p class="status"><svg class="st-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="#1E4A3A"/><circle cx="12" cy="12" r="10" stroke="#1E4A3A" stroke-width="2" fill="none"/></svg><span><strong>Where it stands:</strong> works today on <span class="nw">made-up</span> sample records. No real app is connected yet.</span></p>
+      <p class="act"><a class="btn" href="mailto:hello@kepthold.com">Email us to hear when it is ready</a><span class="addr">hello@kepthold.com</span></p>
     </div>
-    <div class="words">
-      <h1><span class="down">Your software is down.</span> <span class="up">Your answers aren’t.</span></h1>
-      <p class="support">Kepthold copies your invoices, bookings and payroll to a small computer in your office every night. When an app goes down, ask the copy.</p>
-      <div class="acts"><a class="act tear" href="#copy">Tear it off</a><span class="after" hidden><a class="act ask" href="mailto:hello@kepthold.com?subject=Tell%20me%20when%20Kepthold%20is%20ready">Tell me when it’s ready</a><a class="undo" href="#top">put it back</a><span class="addr">hello@kepthold.com</span></span></div>
+    <figure class="mini" aria-label="How it works: apps you rent are copied every night to your computer. You ask, and get the answer with the records behind it.">
+      <div class="mini-rent">
+        <span class="mcap mcap-rent">Apps you rent</span>
+        <span class="mtile">Invoicing</span><span class="mtile">Bookings</span><span class="mtile">Payroll</span>
+      </div>
+      <div class="mini-perf perf" aria-hidden="true"></div>
+      <div class="mini-yours">
+        <span class="mcap mcap-yours">Yours</span>
+        <div class="mini-link"><svg class="mmoon" viewBox="0 0 24 24" aria-hidden="true"><use href="#moon"/></svg><span class="mlab">every night</span><svg class="marrow" viewBox="0 0 64 16" aria-hidden="true"><use href="#arrow"/></svg></div>
+        <div class="mini-box"><svg viewBox="0 0 120 84" aria-hidden="true"><use href="#box"/></svg><span class="mcap">Your computer</span></div>
+        <div class="mini-link"><span class="mlab">you ask</span><svg class="marrow" viewBox="0 0 64 16" aria-hidden="true"><use href="#arrow"/></svg></div>
+        <div class="mini-ans">
+          <span class="mans"><b>4 customers owe $6,320</b>
+            <span class="mrec"><span>Northgate Plumbing</span><span>$2,940</span></span>
+            <span class="mrec"><span>Harbour Lane Bakery</span><span>$1,860</span></span>
+            <span class="mrec"><span>Riverside Dental</span><span>$1,040</span></span>
+            <span class="mrec"><span>Ashford Print Works</span><span>$480</span></span>
+          </span>
+          <span class="mcap">A sample answer, with its records</span>
+        </div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section class="problem wrap" aria-labelledby="h-problem">
+  <div class="pr-text">
+    <h2 id="h-problem">One question, three logins</h2>
+    <p class="lead">Your records are scattered across apps you rent. One question can mean 3 logins. When an app goes down, the answer goes with it.</p>
+  </div>
+  <div class="signins" aria-hidden="true">
+    <div class="signin"><b>Invoicing</b><svg viewBox="0 0 24 24"><use href="#lock"/></svg><span>Signed out</span></div>
+    <div class="signin"><b>Bookings</b><svg viewBox="0 0 24 24"><use href="#lock"/></svg><span>Signed out</span></div>
+    <div class="signin"><b>Payroll</b><svg viewBox="0 0 24 24"><use href="#lock"/></svg><span>Signed out</span></div>
+  </div>
+</section>
+
+<section class="how" id="how" aria-labelledby="h-how">
+  <div class="wrap">
+    <h2 id="h-how">How it works, in 3 steps</h2>
+    <ol class="steps">
+      <li class="step">
+        <div class="pic pic-copy" aria-hidden="true">
+          <div class="sheets"><span class="sheet">Invoicing</span><span class="sheet">Bookings</span><span class="sheet">Payroll</span></div>
+          <div class="night"><svg viewBox="0 0 24 24"><use href="#moon"/></svg><svg class="parrow" viewBox="0 0 64 16"><use href="#arrow"/></svg><span class="fly f1"></span><span class="fly f2"></span><span class="fly f3"></span></div>
+        </div>
+        <h3>Copy</h3>
+        <p>Every night, Kepthold copies what is new from your apps.</p>
+      </li>
+      <li class="step">
+        <div class="pic pic-keep" aria-hidden="true">
+          <svg class="kbox" viewBox="0 0 120 84"><use href="#box"/></svg>
+          <div class="files"><span class="file">Invoices</span><span class="file">Bookings</span><span class="file">Payroll</span></div>
+        </div>
+        <h3>Keep</h3>
+        <p>The copy lives on your computer, in plain files that open without Kepthold. If you stop using us, you keep them.</p>
+      </li>
+      <li class="step">
+        <div class="pic pic-ask" aria-hidden="true">
+          <p class="paper-q">Who owes us for more than 30 days?</p>
+          <div class="paper-a"><b>4 customers owe $6,320.</b>
+            <span class="arec"><span>Northgate Plumbing</span><span>$2,940</span></span>
+            <span class="arec"><span>Harbour Lane Bakery</span><span>$1,860</span></span>
+            <span class="arec"><span>Riverside Dental</span><span>$1,040</span></span>
+            <span class="arec"><span>Ashford Print Works</span><span>$480</span></span>
+          </div>
+        </div>
+        <h3>Ask</h3>
+        <p>You ask in plain words, like “Who owes us for more than 30 days?” You get the answer and the list of records behind it, so you can check it.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="try wrap" id="try" aria-labelledby="h-try">
+  <h2 id="h-try">Try it on sample records</h2>
+  <p class="lead"><span class="js-only">This is a made-up business. Ask the question. Then switch the invoicing app off and ask again.</span><span class="nojs-only">This is a made-up business. Below, the same question twice: first with the invoicing app working, then with it switched off.</span></p>
+
+  <div class="bench" id="bench" data-asked="1" data-open="1" data-off="0">
+    <div class="t-rent">
+      <div class="t-head"><span class="zone">An app you rent</span>
+        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Invoicing app power" id="sw"><span class="knob"></span><span class="sw-on">On</span><span class="sw-off">Off</span></button><span class="on-word">On</span>
+      </div>
+      <p class="app-name">Invoicing</p>
+      <p class="app-state"><span class="ok">Working</span><span class="down">Not responding since 08:12</span></p>
+      <ul class="inv">
+        <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
+        <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
+        <li><span>Riverside Dental</span><span class="amt">$1,040</span></li>
+        <li><span>Ashford Print Works</span><span class="amt">$480</span></li>
+      </ul>
     </div>
-    <div class="stage">
-      <div class="padbox" id="padbox" role="img" aria-label="A duplicate book bound at the top. Its grey top sheet is the invoicing app: who owes us for more than 30 days? Not responding since 08:12. Asked 08:14, no reply. The customers are listed; their figures are not loaded. Tear it off and the green copy underneath answers: 4 customers owe $6,320.">
-        <div class="pool"></div>
-        <picture class="poster"><source media="(max-width: 1023px)" srcset="assets/poster-phone.webp" width="740" height="913"><img src="assets/poster-desk.webp" width="1332" height="1644" alt="" fetchpriority="high" decoding="async"></picture>
-        <div class="revealed"></div>
-        <div class="handle" id="handle" aria-hidden="true"></div>
-        <p class="note" id="hint" aria-hidden="true">or pull the corner</p>
+    <div class="t-perf perf" aria-hidden="true"></div>
+    <div class="t-yours">
+      <span class="zone">Your computer</span>
+      <div class="q-row">
+        <div class="q-paper"><span class="q-tag">Sample question</span><p class="q-text">Who owes us for more than 30 days?</p></div>
+        <button class="btn btn-ask" type="button" id="ask">Ask</button>
+      </div>
+      <div class="answer" aria-live="polite">
+        <p class="wait">The answer shows here, with the records behind it.</p>
+        <div class="ans-card">
+          <p class="still"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#tick"/></svg><span><b>Copy: still answers.</b> From last night's copy.</span></p>
+          <p class="ans-big">4 customers owe $6,320.</p>
+          <p class="ans-src"><span class="src-copy">From last night's copy. </span>Sample data.</p>
+          <button class="btn-rec" type="button" id="rec" aria-expanded="true" aria-controls="records"><span class="r-show">Show the records behind it</span><span class="r-hide">Hide the records</span></button>
+          <div class="records" id="records">
+            <div class="rec-in">
+              <table>
+                <caption>The records behind the answer. Sample data.</caption>
+                <thead><tr><th scope="col">Customer</th><th scope="col">Days</th><th scope="col">Owed</th></tr></thead>
+                <tbody>
+                  <tr><td>Northgate Plumbing</td><td>47 days</td><td>$2,940</td></tr>
+                  <tr><td>Harbour Lane Bakery</td><td>38 days</td><td>$1,860</td></tr>
+                  <tr><td>Riverside Dental</td><td>33 days</td><td>$1,040</td></tr>
+                  <tr><td>Ashford Print Works</td><td>31 days</td><td>$480</td></tr>
+                </tbody>
+                <tfoot><tr><td>Total</td><td></td><td>$6,320</td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="vh">
-    <p>The copy says: who owes us for more than 30 days? 4 customers owe $6,320.</p>
-    <ul><li>Northgate Plumbing, 47 days, $2,940</li><li>Harbour Lane Bakery, 38 days, $1,860</li><li>Riverside Dental, 33 days, $1,040</li><li>Ashford Print Works, 31 days, $480</li><li>Total: 4 customers, $6,320</li></ul>
-    <p>From last night’s copy. Sample data.</p>
-  </div>
-</header>
-</div>
-
-<main class="days" id="days">
-  <div class="sheets">
-    <figure class="d17"><picture><source media="(max-width: 1023px)" data-srcset="assets/day-0417-phone.webp"><img data-src="assets/day-0417.webp" width="1160" height="1400" decoding="async" alt="An earlier leaf torn from the same pad. What did we sell last week? $18,240 from 212 orders: counter sales $9,870, online orders $5,210, catering $2,460, gift cards $700. From the copy a night earlier. Sample data."></picture><noscript><img src="assets/day-0417.webp" width="1160" height="1400" alt="What did we sell last week? $18,240 from 212 orders. Sample data."></noscript></figure>
-    <figure class="d16"><picture><source media="(max-width: 1023px)" data-srcset="assets/day-0416-phone.webp"><img data-src="assets/day-0416.webp" width="1160" height="1400" decoding="async" alt="Another earlier leaf. What is payroll this Friday? $11,460 for 14 people: kitchen $4,980, front of house $3,720, delivery $1,640, office $1,120. From the copy two nights earlier. Sample data."></picture><noscript><img src="assets/day-0416.webp" width="1160" height="1400" alt="What is payroll this Friday? $11,460 for 14 people. Sample data."></noscript></figure>
-  </div>
-</main>
-<footer>
-  <div class="in">
-    <div class="brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><path class="mark-fill" d="M7 3H27V5.6A3 3 0 0 0 27 11.6V13A3 3 0 0 0 27 19V20.4A3 3 0 0 0 27 26.4V29H7A3 3 0 0 1 4 26V6A3 3 0 0 1 7 3Z"/></svg>
-      <span class="name">Kepthold</span>
+    <div class="t-bad">
+      <h3>On a bad day</h3>
+      <p>If an app goes down, raises its price or shuts down, your copy answers with what it had last night.</p>
+      <p class="limit">Kepthold does not replace the app. It keeps your records and your answers.</p>
     </div>
-    <p class="built">Kepthold is being built. Write to <a class="mail" href="mailto:hello@kepthold.com">hello@kepthold.com</a> and we will tell you when it is ready.</p>
-    <p class="sample">The sheets show sample data.</p>
   </div>
+  <script>(function(){var b=document.getElementById('bench');b.dataset.asked='0';b.dataset.open='0';document.getElementById('rec').setAttribute('aria-expanded','false');})();</script>
+
+  <noscript>
+    <div class="bench still-off" data-asked="1" data-open="0" data-off="1">
+      <div class="t-rent">
+        <div class="t-head"><span class="zone">An app you rent</span><span class="off-word">Off</span></div>
+        <p class="app-name">Invoicing</p>
+        <p class="app-state"><span class="ok">Working</span><span class="down">Not responding since 08:12</span></p>
+        <ul class="inv">
+          <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
+          <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
+          <li><span>Riverside Dental</span><span class="amt">$1,040</span></li>
+          <li><span>Ashford Print Works</span><span class="amt">$480</span></li>
+        </ul>
+      </div>
+      <div class="t-perf perf" aria-hidden="true"></div>
+      <div class="t-yours">
+        <span class="zone">Your computer</span>
+        <div class="q-row"><div class="q-paper"><span class="q-tag">Sample question</span><p class="q-text">Who owes us for more than 30 days?</p></div></div>
+        <div class="answer"><div class="ans-card">
+          <p class="still"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#tick"/></svg><span><b>Copy: still answers.</b> From last night's copy.</span></p>
+          <p class="ans-big">4 customers owe $6,320.</p>
+          <p class="ans-src">Sample data.</p>
+        </div></div>
+      </div>
+    </div>
+  </noscript>
+</section>
+
+<section class="private wrap" aria-labelledby="h-private">
+  <div class="pv-pic" aria-hidden="true">
+    <svg class="pv-box" viewBox="0 0 120 84"><use href="#box"/></svg>
+    <p class="pv-cap">Your question is read on this computer, in your office.</p>
+  </div>
+  <div class="pv-text">
+    <h2 id="h-private">Your copy stays in your office</h2>
+    <p class="lead">The part that reads your question runs on your own computer, so no outside AI service sees your payroll or your customers.</p>
+  </div>
+</section>
+
+<section class="close" aria-labelledby="h-close">
+  <div class="wrap close-in">
+    <p class="vision">Own your records, even while you rent the apps.</p>
+    <div class="stands">
+      <h2 id="h-close">Where it stands</h2>
+      <p>Kepthold works today on <span class="nw">made-up</span> sample records. No real app is connected yet. Write to hello@kepthold.com and we will tell you when it is ready.</p>
+      <p class="act"><a class="btn" href="mailto:hello@kepthold.com">Email us to hear when it is ready</a></p>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="foot wrap">
+  <p><b>Kepthold</b></p>
+  <p>Every name and number on this page is made-up sample data.</p>
 </footer>
-<script>
-(function () {
-  var d = document.documentElement;
-  if (location.hash === '#copy' && history.replaceState) history.replaceState(null, '', location.pathname + location.search);
-  /* the earlier copies load once they come within a screen of view; at once where there is no observer */
-  var lazy = [].slice.call(document.querySelectorAll('img[data-src]'));
-  var show = function (i) { var s = i.parentNode.querySelector('source[data-srcset]'); if (s) s.srcset = s.dataset.srcset; i.src = i.dataset.src; };
-  if (!('IntersectionObserver' in window)) lazy.forEach(show);
-  else { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { show(e.target); io.unobserve(e.target); } }); }, { rootMargin: '100% 0px' });
-         lazy.forEach(function (i) { io.observe(i); }); }
-  if (d.classList.contains('still')) {   /* reduced motion or no WebGL: two stills, switched by the button and the link */
-    var tear = document.querySelector('.act.tear'), after = document.querySelector('.after');
-    var flip = function (torn) {
-      d.classList.toggle('is-torn', torn); tear.hidden = torn; after.hidden = !torn;
-      (torn ? document.querySelector('.act.ask') : tear).focus({ preventScroll: true });
-    };
-    tear.addEventListener('click', function (e) {
-      e.preventDefault();
-      var im = new Image();   /* the revealed still is fetched on the first press; switch once it is decoded */
-      im.src = matchMedia('(min-width: 1024px)').matches ? 'assets/poster-desk-torn.webp' : 'assets/poster-phone-torn.webp';
-      (im.decode ? im.decode() : Promise.resolve()).then(function () { flip(true); }, function () { flip(true); });
-    });
-    document.querySelector('.undo').addEventListener('click', function (e) { e.preventDefault(); flip(false); });
-    return;
-  }
-  if (!d.classList.contains('gl')) return;
-  /* the live scene loads after first paint */
-  var go = function () { var s = document.createElement('script'); s.type = 'module'; s.src = 'motion.js'; document.body.appendChild(s); };
-  var start = function () { ('requestIdleCallback' in window) ? requestIdleCallback(go, { timeout: 500 }) : setTimeout(go, 150); };
-  if (document.readyState === 'complete') start(); else addEventListener('load', start);
-})();
-</script>
+<script src="site.js" defer></script>
 </body>
 </html>
