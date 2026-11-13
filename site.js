@@ -5,7 +5,7 @@
   var ask = document.getElementById('ask');
   var rec = document.getElementById('rec');
   var sw = document.getElementById('sw');
-  var paper = document.getElementById('paper');
+  var leaf = document.getElementById('leaf');
 
   function play(cls) {
     if (reduce) return;
@@ -16,7 +16,7 @@
   b.addEventListener('animationend', function (e) {
     var n = e.animationName;
     if (n === 'tear' || n === 'tearm') b.classList.remove('tearing');
-    if (n === 'mend' || n === 'mendm') b.classList.remove('mending');
+    if (n === 'mend') b.classList.remove('mending');
     if (n === 'print') b.classList.remove('printing');
   });
 
@@ -34,8 +34,8 @@
     var off = b.dataset.off !== '1';
     b.dataset.off = off ? '1' : '0';
     sw.setAttribute('aria-checked', off ? 'false' : 'true');
-    if (off) { paper.setAttribute('aria-hidden', 'true'); paper.setAttribute('inert', ''); }
-    else { paper.removeAttribute('aria-hidden'); paper.removeAttribute('inert'); }
+    if (off) { leaf.setAttribute('aria-hidden', 'true'); leaf.setAttribute('inert', ''); }
+    else { leaf.removeAttribute('aria-hidden'); leaf.removeAttribute('inert'); }
     play(off ? 'tearing' : 'mending');
   });
 })();
