@@ -28,15 +28,15 @@ const SLIPS = {
   1: { q: 'Who owes us for more than 30 days?', a: '4 customers owe $6,320.',
        rows: [['Northgate Plumbing', '47 days', '$2,940'], ['Harbour Lane Bakery', '38 days', '$1,860'],
               ['Riverside Dental', '33 days', '$1,040'], ['Ashford Print Works', '31 days', '$480']],
-       tot: ['Total', '4 customers', '$6,320'], kept: 'From last night’s copy', no: 'Copy 418', ch: ['Customer', 'Overdue', 'Amount'] },
+       tot: ['Total', '4 customers', '$6,320'], kept: 'From last night’s copy', no: 'Sample data', ch: ['Customer', 'Overdue', 'Amount'] },
   2: { q: 'What did we sell last week?', a: '$18,240 from 212 orders.',
        rows: [['Counter sales', '148 orders', '$9,870'], ['Online orders', '41 orders', '$5,210'],
               ['Catering', '6 orders', '$2,460'], ['Gift cards', '17 orders', '$700']],
-       tot: ['Total', '212 orders', '$18,240'], kept: 'From the copy a night earlier', no: 'Copy 417', ch: ['Sales', 'Orders', 'Amount'] },
+       tot: ['Total', '212 orders', '$18,240'], kept: 'From the copy a night earlier', no: 'Sample data', ch: ['Sales', 'Orders', 'Amount'] },
   3: { q: 'What is payroll this Friday?', a: '$11,460 for 14 people.',
        rows: [['Kitchen', '6 people', '$4,980'], ['Front of house', '5 people', '$3,720'],
               ['Delivery', '2 people', '$1,640'], ['Office', '1 person', '$1,120']],
-       tot: ['Total', '14 people', '$11,460'], kept: 'From the copy two nights earlier', no: 'Copy 416', ch: ['Team', 'People', 'Amount'] },
+       tot: ['Total', '14 people', '$11,460'], kept: 'From the copy two nights earlier', no: 'Sample data', ch: ['Team', 'People', 'Amount'] },
 };
 
 // ---------------------------------------------------------------- the pad, in pad units (1 unit = 1 CSS px at 1440 x 900)
@@ -122,8 +122,8 @@ layout(location = 0) in vec2 aUV;
 uniform int uKind, uPass;
 uniform float uZ, uFront;
 uniform vec2 uOff;
-uniform mat3 uRot; uniform vec3 uPivot, uTrans; uniform float uFly;
-uniform vec4 uPull;      // the hand: lift of the roll, extra lift on the torn side, lift of the torn top edge, unused
+uniform mat3 uRot; uniform vec3 uPivot, uTrans; uniform float uFly, uFree;
+uniform vec4 uPull;      // the hand: lift of the roll, extra lift on the torn side, how far the torn top edge draws back under the roll, its lift
 uniform vec4 uView;      // origin x, y (css px), scale (px per unit), camera distance
 uniform vec2 uCam, uCanvas, uShv;
 out vec2 vUV; out vec3 vW;
@@ -132,18 +132,21 @@ void main() {
   vec3 P = vec3(aUV, 0.0);
   if (uKind == 5) {
     // where it has torn, the sheet's top edge pulls back toward the roll and lifts: the gap opens behind the tear front
-    float torn = smoothstep(0.0, 40.0, aUV.x - uFront);
+    float torn = max(smoothstep(0.0, 40.0, aUV.x - uFront), uFree);   // once free, the last corner draws back too
     float nearTop = 1.0 - smoothstep(2.0, 34.0, aUV.y);
-    vec2 q = aUV + vec2(0.0, 1.8 * uPull.z * torn * nearTop);
+    // the torn tab is drawn back under the roll: one clean torn fringe (the stub's) is left at the perforation.
+    // The squeeze is monotonic (slope under 1), so the paper never folds over itself.
+    float back = 1.0 - smoothstep(-EB, -EB + 1.6 * uPull.z + 1.0, aUV.y);
+    vec2 q = aUV + vec2(0.0, uPull.z * torn * back);
     P = curlP(q);
     // the hand holds the roll up: the tab between the perforation and the roll slopes up to it, more on the torn side
     float s = dot(q, uFold.xy) - uFold.z;
     float tt = clamp(dot(q, uFold.xy) / max(uFold.z, 1.0), 0.0, 1.0);
     float hold = s > 0.0 ? 1.0 : tt * tt * (3.0 - 2.0 * tt);
     float side = clamp((aUV.x - uFront + 60.0) / 300.0, 0.0, 1.0);
-    P.z += hold * (uPull.x + uPull.y * side) + uPull.z * torn * nearTop;
-    // while it is still on the pad, the roll's ends stay over the pad's edges (the camera's spread would push them past)
-    P.x = mix(P.x, uCam.x + (P.x - uCam.x) * (1.0 - max(P.z, 0.0) / uView.w), 1.0 - uOpen.w);
+    P.z += hold * (uPull.x + uPull.y * side) + uPull.w * torn * nearTop;
+    // the roll's ends stay over the pad's edges, on the pad and while it falls (the camera's spread would push them past)
+    P.x = uCam.x + (P.x - uCam.x) * (1.0 - max(P.z, 0.0) / uView.w);
   }
   if (uKind == 3 && aUV.x > uFront) P.z += 1.1 * smoothstep(-0.75 * EB, EB, aUV.y);   // the torn lip of the stub lifts a little
   if (uKind == 3) P.z += uChord.z * 0.35 * smoothstep(-EB, EB, aUV.y) * step(aUV.x, uFront);   // and is pulled up while the sheet tensions
@@ -176,10 +179,9 @@ float liftedH(vec2 uv, out float near) {  // mean height of the lifted top sheet
 
 const FS = HEAD + `
 in vec2 vUV; in vec3 vW;
-uniform sampler2D uPaper, uEdge, uInk, uWords;
-uniform vec2 uClip;      // x: on the top sheet, a word that reaches the fold goes whole; y: on the copy, a word shows once clear of the roll
-uniform float uExt, uOver;   // how far the roll reaches past its fold line over the copy, and back over the flat sheet
+uniform sampler2D uPaper, uEdge, uInk;   // print is part of the paper: nothing on either sheet is ever hidden by the shader
 uniform int uKind, uPass;
+uniform float uDbg;
 uniform float uFront, uFresh, uRelief, uAlb, uTexK, uInkOn, uTornTop, uFly, uPoolOn, uShade, uLift, uMat, uFade;
 uniform vec4 uRect, uView;
 uniform vec3 uTint, uTintBack, uL, uPoolTint;
@@ -233,6 +235,7 @@ void main() {
     a *= ea;
   }
   if (a < 0.004) discard;
+  if (uDbg > 0.5 && uKind == 5 && dot(vUV, uFold.xy) - uFold.z > 0.0) discard;   // tools/inkcheck.py: the flat part alone
   if (uPass == 1) {   // shadow map: any caster, casters above the copy, the lifted top sheet, its height
     if (a < 0.5) discard;
     float z = vW.z;
@@ -265,24 +268,12 @@ void main() {
   if (uInkOn > 0.5) {
     vec2 iu = vec2(u / ${PW}.0, v / ${PH}.0);
     if (iu.x > 0.0 && iu.x < 1.0 && iu.y > 0.0 && iu.y < 1.0) {
-      if (back) {   // seen from behind, the print shows through the thin stock: faint, soft, mirrored by itself
-        vec3 thru = textureLod(uInk, iu, 4.6).rgb;
-        inkc = mix(vec3(1.0), thru, 0.09);
+      if (back) {   // seen from behind: the coated sheet is opaque enough that no print shows through
+        inkc = vec3(1.0);
       } else {
         vec3 sharp = texture(uInk, iu).rgb;
         vec3 soft = textureLod(uInk, iu, 1.2).rgb;
         inkc = min(sharp, mix(vec3(1.0), soft, uMat > 0.5 ? 0.15 : 0.4));   // uncoated stock spreads the ink a little
-        if (uClip.x + uClip.y > 0.001) {   // whole words only: no fragment of a word beside the fold or the roll
-          vec4 wb = texture(uWords, iu);
-          if (wb.b >= wb.r) {
-            vec2 a0 = wb.rg * vec2(${PW}.0, ${PH}.0), a1 = wb.ba * vec2(${PW}.0, ${PH}.0), nn = uFold.xy;
-            float d0 = dot(a0, nn), d1 = dot(vec2(a1.x, a0.y), nn), d2 = dot(vec2(a0.x, a1.y), nn), d3 = dot(a1, nn);
-            float sMax = max(max(d0, d1), max(d2, d3)) - uFold.z, sMin = min(min(d0, d1), min(d2, d3)) - uFold.z;
-            float keep = uKind == 5 ? mix(1.0, 1.0 - smoothstep(-uOver - 16.0, -uOver, sMax), uClip.x)
-                                    : mix(1.0, smoothstep(uExt, uExt + 14.0, sMin), uClip.y);
-            inkc = mix(vec3(1.0), inkc, keep);
-          }
-        }
       }
       inkAmt = 1.0 - min(inkc.r, min(inkc.g, inkc.b));
     }
@@ -297,7 +288,7 @@ void main() {
     float take = uMat > 0.5 ? 0.97 : 0.93 - 0.05 * vnoise(vUV / 2.2) - 0.03 * (formation - 0.5);
     col *= 1.0 - (1.0 - inkc) * take;
   }
-  col = mix(col, vec3(0.985, 0.985, 0.975), clamp(core, 0.0, 1.0) * 0.9);   // the torn fibre: paler and brighter than the face
+  col = mix(col, vec3(0.985, 0.985, 0.975), clamp(core, 0.0, 1.0) * 0.6);   // the torn fibre: a little paler than the face
   // ---- light
   vec3 Lv = normalize(uL);
   float wrapK = (uKind == 5 && uFly > 0.5) ? 0.4 : 0.0;   // thin paper: light wraps a little round a bend
@@ -316,7 +307,7 @@ void main() {
     if (uKind == 5 && z > ZT + 1.0) occ *= smoothstep(z + 8.0, z + 40.0, hl);   // only what stands higher than this point
     sh = 1.0 - occ * (uKind <= 2 && near < 0.5 ? 0.42 : 0.36 - 0.25 * smoothstep(10.0, 220.0, dh));   // a high caster: wider, fainter
   }
-  float amb = (uKind == 5 && uFly < 0.5 ? 0.30 : 0.42) + 0.08 * Nf.z;   // the roll: deeper form shading                        // sky fill: what faces up gets a little more
+  float amb = (uKind == 5 && uFly < 0.5 ? 0.36 : 0.42) + 0.08 * Nf.z;   // the roll: deeper form shading                        // sky fill: what faces up gets a little more
   float keyF = max(dot(N, Lv), 0.0) / Lv.z;              // the light on the printed face
   float trans = back ? 0.30 * keyF : 0.0;                 // from the back, some of it comes through the thin stock
   vec3 warm = vec3(1.0, 0.988, 0.962);
@@ -325,10 +316,10 @@ void main() {
     float bent = 1.0 - abs(N.z);
     vec3 H = normalize(Lv + V);
     // coated face: a broad soft gloss; the uncoated back of the sheet: almost none
-    float gl = back ? 0.05 : 0.16;
-    lit += warm * pow(max(dot(Np, H), 0.0), back ? 10.0 : 22.0) * gl * smoothstep(0.02, 0.3, bent) * sh;
+    float gl = back ? 0.02 : 0.06;   // matte paper: a faint, broad sheen, never a chrome streak
+    lit += warm * pow(max(dot(Np, H), 0.0), back ? 6.0 : 12.0) * gl * smoothstep(0.02, 0.3, bent) * sh;
     float facing = abs(dot(N, V));
-    lit += tint * pow(1.0 - facing, 3.0) * 0.18 * smoothstep(0.0, 0.6, key) * smoothstep(0.05, 0.25, bent);   // the bright lip
+    lit += tint * pow(1.0 - facing, 3.0) * 0.08 * smoothstep(0.0, 0.6, key) * smoothstep(0.05, 0.25, bent);   // the lip, soft
     a *= 1.0 - uFade;
   }
   if (uMat > 0.5 && !back && N.z > 0.9) {   // the coated sheet lying flat: a wide, faint sheen where the key light mirrors
@@ -475,30 +466,12 @@ function group(fn) {   // what fn prints is one unit for the clip: a two-line an
   const bs = WORDS.splice(n);
   WORDS.push([Math.min(...bs.map(b => b[0])), Math.min(...bs.map(b => b[1])), Math.max(...bs.map(b => b[2])), Math.max(...bs.map(b => b[3]))]);
 }
-const WB = [260, 305];   // the word-box map: 2 sheet units per texel
-function wordMap(boxes) {
-  const [W, H] = WB, d = new Uint8Array(W * H * 4);
-  for (let i = 0; i < W * H; i++) { d[i * 4] = 255; d[i * 4 + 1] = 255; d[i * 4 + 2] = 0; d[i * 4 + 3] = 0; }   // empty: no word
-  const q = (x, m, up) => clamp(up ? Math.ceil(x / m * 255) : Math.floor(x / m * 255), 0, 255);
-  for (const [x0, y0, x1, y1] of boxes) {
-    const i0 = Math.max(0, Math.floor(x0 / PW * W) - 1), i1 = Math.min(W - 1, Math.ceil(x1 / PW * W) + 1);
-    const j0 = Math.max(0, Math.floor(y0 / PH * H) - 1), j1 = Math.min(H - 1, Math.ceil(y1 / PH * H) + 1);
-    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
-      const k = (j * W + i) * 4; d.set([q(x0, PW, 0), q(y0, PH, 0), q(x1, PW, 1), q(y1, PH, 1)], k);
-    }
-  }
-  const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
-  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, W, H, 0, gl.RGBA, gl.UNSIGNED_BYTE, d);
-  for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.NEAREST], [gl.TEXTURE_MAG_FILTER, gl.NEAREST], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
-  return t;
-}
 // Both sheets are printed on ONE grid, so that when the corner lifts the copy reads as the same page, now with numbers:
 // the question on the same baseline, the big line (failure / answer) on the same two baselines, the status line,
 // the column heads, the row rules and the three column edges all shared. Units are sheet units (v down from the perforation).
 function gridFor(phone) {
   return phone
-    ? { X: 40, MX: 480, C2: 340, hd: [20, 40, 60], f: [76, 132], q: 112, qs: [21, 30], big: [204, 262], bigS: 56, st: [306, 20],
+    ? { X: 40, MX: 480, C2: 356, hd: [20, 40, 60], f: [76, 132], q: 112, qs: [21, 30], big: [204, 262], bigS: 56, st: [306, 20],
         ch: [352, 16], r: [364, 43, 21] }
     : { X: 44, MX: 476, C2: 336, hd: [16, 40, 60], f: [80, 128], q: 110, qs: [17, 27], big: [200, 256], bigS: 50, st: [300, 16],
         ch: [352, 13], r: [366, 40, 16] };
@@ -533,11 +506,11 @@ function drawCopy(phone, slip) {   // the green kept copy
   c.font = `650 ${bs}px ${SERIF}`;
   group(() => balance2(c, slip.a, W).forEach((l, i) => text(c, l, X, G.big[i], `650 ${bs}px ${SERIF}`, '#1E4A3A')));
   ls(c, 0);
-  // what this sheet is, and when it was kept
+  // when it was kept; and, plainly, that the businesses on it are made up
   c.font = `500 ${G.st[1]}px ${SANS}`;
   const sts = fitSize(c, [slip.kept], 500, SANS, G.st[1], W - c.measureText(slip.no).width - 28, 1);
   text(c, slip.kept, X, G.st[0], `500 ${sts}px ${SANS}`, '#1E4A3A');
-  text(c, slip.no, MX, G.st[0], `500 ${sts}px ${SANS}`, '#16181D', 'right');
+  text(c, slip.no, MX, G.st[0], `500 ${sts}px ${SANS}`, '#46604F', 'right');
   const [chy, chs] = G.ch;
   text(c, slip.ch[0], X, chy, `600 ${chs}px ${SANS}`, '#5E7A6B');
   text(c, slip.ch[1], C2, chy, `600 ${chs}px ${SANS}`, '#5E7A6B', 'right');
@@ -560,7 +533,7 @@ function drawApp(phone) {         // the grey top sheet: the invoicing app's pag
   const G = gridFor(phone), { X, MX, C2 } = G, W = MX - X;
   const [hs, hb, hr] = G.hd;
   text(c, 'Invoices', X, hb, `600 ${hs}px ${SANS}`, '#4A5057');
-  c.fillStyle = '#B9BDC2'; c.fillRect(0, hr, PW, 1.1);
+  c.fillStyle = '#B9BDC2'; c.fillRect(X - 14, hr, W + 28, 1.1);   // the header rule spans the search field, not the paper's edges
   // the search field: the question sits on the shared baseline at the left column edge; the glass sits at the right
   const [fy0, fy1] = G.f, qf = G.qs[0];
   c.strokeStyle = '#8F959B'; c.lineWidth = 1.3; c.beginPath();
@@ -595,6 +568,7 @@ function drawApp(phone) {         // the grey top sheet: the invoicing app's pag
 let phone = false, view = null, inkCopy = null, inkApp = null, wordsCopy = null, wordsApp = null, need = true;
 let paperTex, edgeTex, meshBoard, meshStack, meshGreen, meshFringe, meshBind, meshTop;
 let maps = null;   // shadow map pyramid
+let DBG = null;    // 'app' | 'copy': tools/inkcheck.py draws one sheet alone
 const st = { focusNext: null, p: 0, drag: null, anim: null, aoff: 0, lastHole: -1, shiver: 0, frameMs: [], nudged: false, touched: false };
 
 function pickLayout() {
@@ -632,9 +606,9 @@ function resize() {
 }
 function buildInk() {
   const slip = SLIPS[SHEET || 1];
-  for (const t of [inkCopy, inkApp, wordsCopy, wordsApp]) if (t) gl.deleteTexture(t);
-  WORDS = []; inkCopy = tex(drawCopy(phone, slip), true, gl.CLAMP_TO_EDGE); wordsCopy = wordMap(WORDS);
-  WORDS = []; inkApp = tex(drawApp(phone), true, gl.CLAMP_TO_EDGE); wordsApp = wordMap(WORDS);
+  for (const t of [inkCopy, inkApp]) if (t) gl.deleteTexture(t);
+  WORDS = []; inkCopy = tex(drawCopy(phone, slip), true, gl.CLAMP_TO_EDGE); wordsCopy = WORDS;   // the boxes, for tools/inkcheck.py
+  WORDS = []; inkApp = tex(drawApp(phone), true, gl.CLAMP_TO_EDGE); wordsApp = WORDS;
   WORDS = null;
 }
 function buildMeshes() {
@@ -656,7 +630,8 @@ function buildMeshes() {
 // 0.60 to 0.65 free, the sheet springs open and lifts toward the viewer: its printed face and its paler back both show.
 // 0.65 to 0.84 it turns a little and drops out through the bottom of the frame; its shadow lifts off the pad and fades.
 // 0.84 to 1    the green copy, after a small settle of the pad.
-const PA = 0.30, PB = 0.60;          // PA: the copy shows; PB: past it, a released drag finishes by itself
+const PA = 0.30, PB = 0.60, T_SAY = 0.60;   // PA: the curl turns into the roll; PB: past it, a released drag finishes by itself;
+                                            // T_SAY: the answer is wholly uncovered and the button changes
 const CS = 62;                       // where the roll stops: its fold line, units below the perforation
 const T_ROLL = 0.44, T_TEN = 0.48, T_TORN = 0.60, T_OPEN = 0.65, T_GONE = 0.84;
 function foldFrom(p1, p2) {          // fold normal (pointing at the rolled part), offset, and its span inside the sheet
@@ -684,7 +659,7 @@ function spiralK(nn, c, R, f) {      // the spiral that ends its innermost turn 
 }
 function tearParams(p, aoff = 0) {
   let dL, dR, R, k, cone = 0, tele = 0, uneven = 0, lift = 0, front = PW + 2;
-  let pull = [0, 0, 0], fly = null, clipT = 1, clipG = 1, open = [1, 0, 0, 0];
+  let pull = [0, 0, 0, 0], fly = null, open = [1, 0, 0, 0];
   const dTop = PW + PH - CS, rTop = PH - CS;
   if (p <= PA) {
     const t = p / PA, e = 0.25 * t + 0.75 * ease(t);
@@ -716,34 +691,35 @@ function tearParams(p, aoff = 0) {
       const kk = f / PITCH, fr = kk - Math.floor(kk);
       f = (Math.floor(kk) + smooth(0.3, 0.8, fr)) * PITCH;   // it hangs on each bridge, then lets go
       front = t >= 1 ? -2 : f;
-      pull[1] = 22 * smooth(0, 1, t); pull[2] = 7 * smooth(0, 0.25, t);
+      pull[1] = 22 * smooth(0, 1, t); pull[2] = 38 * smooth(0, 0.3, t); pull[3] = 7 * smooth(0, 0.25, t);
     }
   }
-  if (p > T_TORN) {                               // free: it springs open as it lifts, then drops
+  if (p > T_TORN) {                               // free: the roll loosens as it comes away, then drops as one roll
     const t = clamp((p - T_TORN) / (T_OPEN - T_TORN)), e = ease(t);
-    const cO = -EB - 2, RO = 380;
-    open = [RO, spiralK(nn, cO, RO, 0.8), cO, smooth(0, 0.4, t)];
+    // the whole sheet goes into one loose turn and a half; its axis stays where the roll was, so it does not jump up the pad.
+    // The torn tab, drawn back by the pull, starts the outer turn underneath: no torn edge stands over the copy.
+    const cO = 40, RO = phone ? 66 : 70;
+    open = [RO, spiralK(nn, cO, RO, 0.78), cO, e];
     uneven *= 1 - e; cone *= 1 - e; tele *= 1 - e;
-    pull = [lerp(16, 64, e), lerp(22, 0, e), 7];
-    clipT = 1 - smooth(0.32, 0.52, t); clipG = 1 - smooth(0, 0.35, t);
+    pull = [lerp(16, 40, e), lerp(22, 0, e), 38, 7];
     const tf = clamp((p - T_OPEN) / (T_GONE - T_OPEN));
     const fall = Math.pow(tf, 1.7);
-    fly = { pitch: -0.45 * e + 0.22 * smooth(0, 1, tf), yaw: 0.05 * e + 0.20 * fall, roll: 0.30 * smooth(0, 1, tf),
-            t: [36 * fall, -12 * e + 1320 * fall, 40 * e + 70 * tf] };
+    // it tumbles a little about its own axis and barely turns, so it stays over the pad while it is in view
+    fly = { pitch: -0.35 * e - 1.1 * fall, yaw: 0.03 * e + 0.05 * fall, roll: 0.05 * smooth(0, 1, tf),
+            t: [0, -6 * e + 1500 * fall, 20 * e + 40 * tf], RO, cO };
   }
-  const ext = R * (1 + Math.max(0, -k) * 1.8) + 8 + pull[0] * 0.5, over = p <= PA ? R * 0.9 : R * 1.05;
   const [tmin, tmax] = chord(nn, c);
   const a = Math.atan2(nn[1], nn[0]);
   // a tilted roll's round end would stand out past the sheet's edge: keep it inside by its radius times the tilt
   const tilt = Math.min(Math.abs(nn[0] / (nn[1] || 1e-6)), Math.abs(nn[1] / (nn[0] || 1e-6)));
   const inset = Math.min(R, R * tilt) * 1.1 * smooth(PA, PA + 0.04, p) * (1 - smooth(T_TORN, T_TORN + 0.02, p));
-  return { inset, a, c, R, k, cone, tele, uneven, tmin, tmax, lift, front, pull, fly, clipT, clipG, ext, over, open, gone: p >= T_GONE };
+  return { inset, a, c, R, k, cone, tele, uneven, tmin, tmax, lift, front, pull, fly, open, free: smooth(T_TORN, T_TORN + 0.03, p), gone: p >= T_GONE };
 }
 function leafParams() {   // a torn-off leaf for the lower page: its bottom-right corner lifts a little, its torn top edge too
   const { nn, c } = foldFrom(endL(92), endR(92));
   const [tmin, tmax] = chord(nn, c);
   return { a: Math.atan2(nn[1], nn[0]), c, R: 30, k: -0.09, cone: 0, tele: 0, uneven: 0.02, tmin, tmax, lift: 0, front: -2,
-           pull: [0, 0, 2.5], fly: null, clipT: 0, clipG: 0, ext: 0, over: 0, open: [1, 0, 0, 0], gone: false };
+           pull: [0, 0, 0, 2.5], fly: null, open: [1, 0, 0, 0], gone: false };
 }
 function flyMatrix(tp) {   // the free sheet: about its top edge, Rz(yaw) Ry(roll) Rx(pitch), then moved
   const { pitch: x, yaw: z, roll: y } = tp.fly;
@@ -753,7 +729,7 @@ function flyMatrix(tp) {   // the free sheet: about its top edge, Rz(yaw) Ry(rol
              sz * cy, sz * sy * sx + cz * cx, sz * sy * cx - cz * sx,
              -sy, cy * sx, cy * cx];
   const colMajor = new Float32Array([M[0], M[3], M[6], M[1], M[4], M[7], M[2], M[5], M[8]]);
-  return { m: colMajor, pivot: [PW / 2, -EB, Z_TOP + tp.pull[0]], trans: tp.fly.t };
+  return { m: colMajor, pivot: [PW / 2, tp.fly.cO, Z_TOP + tp.pull[0] + tp.fly.RO], trans: tp.fly.t };   // about the roll's axis
 }
 
 // ---------------------------------------------------------------- drawing
@@ -777,8 +753,7 @@ function drawSheets(pass, P, tp) {
   gl.uniform1f(g.uShade, pass === 0 ? 1 : 0);
   gl.uniform4f(g.uFold, Math.cos(tp.a), Math.sin(tp.a), tp.c, tp.R); gl.uniform4f(g.uBend, tp.k, tp.cone, tp.tele, tp.uneven);
   gl.uniform4f(g.uChord, tp.tmin, tp.tmax, tp.lift, tp.inset || 0);
-  gl.uniform4f(g.uPull, ...tp.pull, 0); gl.uniform4f(g.uOpen, ...tp.open);
-  gl.uniform1f(g.uExt, tp.ext); gl.uniform1f(g.uOver, tp.over);
+  gl.uniform4f(g.uPull, ...tp.pull); gl.uniform1f(g.uFree, tp.free || 0); gl.uniform4f(g.uOpen, ...tp.open);
   gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, paperTex); gl.uniform1i(g.uPaper, 0);
   gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, edgeTex); gl.uniform1i(g.uEdge, 1);
   if (pass === 0) bindShadows(g);
@@ -798,14 +773,20 @@ function drawSheets(pass, P, tp) {
     gl.uniform1f(g.uRelief, opt.relief ?? 0.5); gl.uniform1f(g.uAlb, opt.alb ?? 0.06);
     gl.uniform1f(g.uInkOn, opt.ink ? 1 : 0);
     if (opt.ink) { gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, opt.ink); gl.uniform1i(g.uInk, 2); }
-    gl.uniform2f(g.uClip, ...(opt.clip || [0, 0]));
-    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, opt.words || wordsCopy); gl.uniform1i(g.uWords, 3);
     gl.uniform1f(g.uLift, opt.lift ?? 1); gl.uniform1f(g.uMat, opt.mat ?? 0); gl.uniform1f(g.uFade, opt.fade ?? 0);
     gl.bindVertexArray(mesh.vao); gl.drawElements(gl.TRIANGLES, mesh.n, gl.UNSIGNED_SHORT, 0);
   };
   const KEPT = [0.862, 0.914, 0.874], GREY = [0.80, 0.812, 0.826], GREY_B = [0.855, 0.86, 0.868];
   const COPY = { relief: 0.13, alb: 0.045, texK: 0.6, mat: 0 };               // uncoated carbonless copy paper
   const APP = { relief: 0.05, alb: 0.012, texK: 1.5, mat: 1, texOff: [0.37, 0.61] };   // the app's coated sheet
+  if (DBG) {     // tools/inkcheck.py: one sheet alone, unshaded and unmoved, so its print can be compared frame to frame
+    gl.uniform1f(g.uShade, 0); gl.uniform1f(g.uPoolOn, 0); gl.uniform1f(g.uDbg, 1);
+    gl.uniformMatrix3fv(g.uRot, false, new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]));
+    if (DBG === 'copy') draw(meshGreen, 2, Z_GREEN, [0, PW, -15, PH], KEPT, KEPT, { ...COPY, ink: inkCopy, off: [0, 0] });
+    else if (!tp.fly) { gl.uniform1f(g.uFront, tp.front); draw(meshTop, 5, Z_TOP, [0, PW, -EB - 0.5, PH], GREY, GREY_B, { ...APP, ink: inkApp, off: [0, 0] }); }
+    gl.uniform1f(g.uDbg, 0); gl.bindVertexArray(null); return;
+  }
+  gl.uniform1f(g.uDbg, 0);
   if (SHEET) {   // a lone kept copy for the lower page: torn off the book along its top perforation, its corner a little curled
     gl.uniform1f(g.uFront, -2);
     gl.uniformMatrix3fv(g.uRot, false, new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]));
@@ -823,8 +804,8 @@ function drawSheets(pass, P, tp) {
     draw(meshStack, 1, Z_BOARD + Z_GAP * (i + 1), [l, PW + r, -15, PH + dy], tint, tint,
          { ...(greenSheet ? COPY : APP), off: [off[0] + dx * 0.3, off[1]], texOff: [0.13 * i, 0.29 * i], lift: 0.84 + 0.03 * i });
   }
-  // the kept copy: while the top sheet is lifting, a word shows only once it is wholly clear of the roll
-  draw(meshGreen, 2, Z_GREEN, [0, PW, -15, PH], KEPT, KEPT, { ...COPY, ink: inkCopy, words: wordsCopy, clip: [0, tp.clipG] });
+  // the kept copy: all of its print is always there; the top sheet uncovers it as it leaves
+  draw(meshGreen, 2, Z_GREEN, [0, PW, -15, PH], KEPT, KEPT, { ...COPY, ink: inkCopy });
   // the top sheet's stub under the binding: it stays when the sheet goes
   gl.uniform1f(g.uFront, tp.front); gl.uniform1f(g.uFresh, 0.6);
   draw(meshFringe, 3, Z_TOP, [0, PW, -15, EB + 0.5], GREY, GREY_B, { ...APP });
@@ -835,7 +816,7 @@ function drawSheets(pass, P, tp) {
     gl.uniform1f(g.uFly, 1); gl.uniformMatrix3fv(g.uRot, false, fm.m); gl.uniform3f(g.uPivot, ...fm.pivot); gl.uniform3f(g.uTrans, ...fm.trans);
   } else { gl.uniform1f(g.uFly, 0); gl.uniformMatrix3fv(g.uRot, false, new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1])); }
   if (pass === 0) { gl.enable(gl.DEPTH_TEST); gl.clear(gl.DEPTH_BUFFER_BIT); }
-  if (!tp.gone) draw(meshTop, 5, Z_TOP, [0, PW, -EB - 0.5, PH], GREY, GREY_B, { ...APP, ink: inkApp, words: wordsApp, clip: [tp.clipT, 0], off: tp.fly ? [0, 0] : off });
+  if (!tp.gone) draw(meshTop, 5, Z_TOP, [0, PW, -EB - 0.5, PH], GREY, GREY_B, { ...APP, ink: inkApp, off: tp.fly ? [0, 0] : off });
   gl.uniform1f(g.uFly, 0);
   draw(meshBind, 4, Z_BIND, [BOX[0], BOX[0] + BOX[2], -58, -18], [0.155, 0.205, 0.183], null, { relief: 0.9, alb: 0.16, texOff: [0.5, 0.1], texK: 1.3, off: [off[0] * 0.5, off[1]] });
   gl.disable(gl.DEPTH_TEST);
@@ -966,10 +947,10 @@ function tick(now) {
     hero.classList.toggle('flying', !!ftp.fly && !ftp.gone);   // the falling sheet passes in front of the words
     st.frameMs.push(performance.now() - t0); if (st.frameMs.length > 600) st.frameMs.shift();
     need = false;
-    hint.style.opacity = String(1 - smooth(0.08, 0.16, st.p));
+    hint.style.opacity = String(1 - smooth(0.28, 0.34, st.p));
     handle.style.display = st.p > PB ? 'none' : '';
-    setLabel(st.p > PA);
-    doc.classList.toggle('is-torn', st.p > PA);
+    setLabel(st.p >= T_SAY);                    // the next step changes only once the answer is wholly in view
+    doc.classList.toggle('is-torn', st.p >= T_SAY);
     if (!live) { live = true; doc.classList.add('live'); window.__klive = true; scheduleNudge(); }
   }
   window.__kp = st.p;
@@ -987,6 +968,31 @@ function scheduleNudge() {   // one small lift of the corner after load, so it r
 window.__ktime = () => st.frameMs.slice();
 window.__kset = (p) => { FIXED = p; st.p = p; st.anim = null; st.shiver = 0; need = true; };
 window.__kbox = () => { const r = box.getBoundingClientRect(), h = hero.getBoundingClientRect(); return { x: r.left - h.left, y: r.top - h.top, w: r.width, h: r.height, s: view.s }; };
+// tools/inkcheck.py: for progress p, every printed item of the grey sheet (or the copy) with its state and its pixels,
+// drawn alone, unshaded. An item is flat when the sheet there is unlifted: before the hand lifts the roll, and wholly
+// on the near side of the fold line.
+window.__kitems = (p, which) => {
+  const tp = tearParams(p), nn = [Math.cos(tp.a), Math.sin(tp.a)];
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.BLEND); gl.blendEquation(gl.FUNC_ADD); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+  DBG = which; drawSheets(0, p, tp); DBG = null;
+  const W = canvas.width, H = canvas.height, dpr = view.dpr, k = CAM_D / (CAM_D - (which === 'copy' ? Z_GREEN : Z_TOP));
+  const px = (u, v) => [(view.ox + (CAM[0] + (u - CAM[0]) * k) * view.s) * dpr, (view.oy + (CAM[1] + (v - CAM[1]) * k) * view.s) * dpr];
+  const out = (which === 'copy' ? wordsCopy : wordsApp).map(([x0, y0, x1, y1]) => {
+    const sMax = Math.max(...[[x0, y0], [x1, y0], [x0, y1], [x1, y1]].map(([u, v]) => u * nn[0] + v * nn[1] - tp.c));
+    const flat = which === 'copy' ? true : (!tp.fly && p <= T_ROLL && sMax < 0);
+    const [a0, b0] = px(x0, y0), [a1, b1] = px(x1, y1);
+    const X0 = Math.max(0, Math.floor(a0)), Y0 = Math.max(0, Math.floor(b0)), X1 = Math.min(W, Math.ceil(a1)), Y1 = Math.min(H, Math.ceil(b1));
+    const buf = new Uint8Array(Math.max(1, (X1 - X0) * (Y1 - Y0) * 4));
+    gl.readPixels(X0, H - Y1, X1 - X0, Y1 - Y0, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    let sum = 0, dark = 0, n = 0, alpha = 0;
+    for (let i = 0; i < buf.length; i += 4) { const l = (buf[i] * 0.3 + buf[i + 1] * 0.59 + buf[i + 2] * 0.11); sum += l; n++; alpha += buf[i + 3]; if (buf[i + 3] > 200 && l < 150) dark++; }
+    return { box: [x0, y0, x1, y1], flat, sMax, mean: sum / Math.max(1, n), dark, alpha: alpha / Math.max(1, n) };
+  });
+  need = true;
+  return { p, which, R: tp.R, fold: tp.c, items: out };
+};
 window.__kcorner = () => [view.ox + PW * view.s, view.oy + PH * view.s];
 
 (async () => {

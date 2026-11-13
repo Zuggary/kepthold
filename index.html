@@ -79,6 +79,7 @@ h1 .up { color: var(--kept-deep); }
 .after { display: inline-flex; align-items: center; gap: 20px; }
 .undo { font: 400 15px/24px var(--sans); color: var(--muted); text-underline-offset: 3px; text-decoration-thickness: 1px; white-space: nowrap; }
 .undo:hover { color: var(--ink); }
+.addr { position: absolute; left: 0; top: calc(100% + 6px); font: 400 13px/16px var(--sans); color: var(--muted); white-space: nowrap; letter-spacing: .005em; }
 .act[hidden], .after[hidden] { display: none; }
 html:not(.js) .hero:target .act.tear { display: none; }
 html:not(.js) .hero:target .after { display: inline-flex; }
@@ -100,7 +101,7 @@ html:not(.gl).is-torn .revealed, html:not(.js) .hero:target .revealed { opacity:
 html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: hidden; }
 .live .poster, .live .revealed { visibility: hidden; }
 .gl-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; pointer-events: none; }
-.flying .gl-scene { z-index: 3; }   /* the torn sheet falls toward the viewer, in front of the words */
+.flying .gl-scene { z-index: 5; }   /* the torn sheet falls toward the viewer, in front of the words and the button */
 .handle { position: absolute; width: 104px; height: 104px; left: calc(99.43% - 78px); top: calc(97.95% - 78px); z-index: 3; display: none;
   touch-action: pan-y; cursor: grab; -webkit-tap-highlight-color: transparent; }
 .live .handle { display: block; }
@@ -171,7 +172,7 @@ footer .sample { color: var(--pencil); font-size: 14px; }
     grid-template-columns: calc(687 * var(--u)) 1fr; grid-template-rows: auto auto; row-gap: 8px; }
   footer .brand { grid-column: 1; grid-row: 1; }
   footer .built { grid-column: 1; grid-row: 2; }
-  footer .sample { grid-column: 2; grid-row: 2; }
+  footer .sample { grid-column: 1; grid-row: 3; }
 }
 @media (max-width: 1023px) {
   .days { padding: 20px 16px 40px; }
@@ -194,7 +195,7 @@ footer .sample { color: var(--pencil); font-size: 14px; }
     <div class="words">
       <h1><span class="down">Your software is down.</span> <span class="up">Your answers aren’t.</span></h1>
       <p class="support">Kepthold copies your invoices, bookings and payroll to a small computer in your office every night. When an app goes down, ask the copy.</p>
-      <div class="acts"><a class="act tear" href="#copy">Tear it off</a><span class="after" hidden><a class="act ask" href="mailto:hello@kepthold.com?subject=Tell%20me%20when%20Kepthold%20is%20ready">Tell me when it’s ready</a><a class="undo" href="#top">put it back</a></span></div>
+      <div class="acts"><a class="act tear" href="#copy">Tear it off</a><span class="after" hidden><a class="act ask" href="mailto:hello@kepthold.com?subject=Tell%20me%20when%20Kepthold%20is%20ready">Tell me when it’s ready</a><a class="undo" href="#top">put it back</a><span class="addr">hello@kepthold.com</span></span></div>
     </div>
     <div class="stage">
       <div class="padbox" id="padbox" role="img" aria-label="A duplicate book bound at the top. Its grey top sheet is the invoicing app: who owes us for more than 30 days? Not responding since 08:12. Asked 08:14, no reply. The customers are listed; their figures are not loaded. Tear it off and the green copy underneath answers: 4 customers owe $6,320.">
@@ -209,15 +210,15 @@ footer .sample { color: var(--pencil); font-size: 14px; }
   <div class="vh">
     <p>The copy says: who owes us for more than 30 days? 4 customers owe $6,320.</p>
     <ul><li>Northgate Plumbing, 47 days, $2,940</li><li>Harbour Lane Bakery, 38 days, $1,860</li><li>Riverside Dental, 33 days, $1,040</li><li>Ashford Print Works, 31 days, $480</li><li>Total: 4 customers, $6,320</li></ul>
-    <p>From last night’s copy, copy 418.</p>
+    <p>From last night’s copy. Sample data.</p>
   </div>
 </header>
 </div>
 
 <main class="days" id="days">
   <div class="sheets">
-    <figure class="d17"><picture><source media="(max-width: 1023px)" data-srcset="assets/day-0417-phone.webp"><img data-src="assets/day-0417.webp" width="1160" height="1400" decoding="async" alt="An earlier leaf torn from the same pad. What did we sell last week? $18,240 from 212 orders: counter sales $9,870, online orders $5,210, catering $2,460, gift cards $700. From the copy a night earlier, copy 417."></picture><noscript><img src="assets/day-0417.webp" width="1160" height="1400" alt="What did we sell last week? $18,240 from 212 orders. Copy 417."></noscript></figure>
-    <figure class="d16"><picture><source media="(max-width: 1023px)" data-srcset="assets/day-0416-phone.webp"><img data-src="assets/day-0416.webp" width="1160" height="1400" decoding="async" alt="Another earlier leaf. What is payroll this Friday? $11,460 for 14 people: kitchen $4,980, front of house $3,720, delivery $1,640, office $1,120. From the copy two nights earlier, copy 416."></picture><noscript><img src="assets/day-0416.webp" width="1160" height="1400" alt="What is payroll this Friday? $11,460 for 14 people. Copy 416."></noscript></figure>
+    <figure class="d17"><picture><source media="(max-width: 1023px)" data-srcset="assets/day-0417-phone.webp"><img data-src="assets/day-0417.webp" width="1160" height="1400" decoding="async" alt="An earlier leaf torn from the same pad. What did we sell last week? $18,240 from 212 orders: counter sales $9,870, online orders $5,210, catering $2,460, gift cards $700. From the copy a night earlier. Sample data."></picture><noscript><img src="assets/day-0417.webp" width="1160" height="1400" alt="What did we sell last week? $18,240 from 212 orders. Sample data."></noscript></figure>
+    <figure class="d16"><picture><source media="(max-width: 1023px)" data-srcset="assets/day-0416-phone.webp"><img data-src="assets/day-0416.webp" width="1160" height="1400" decoding="async" alt="Another earlier leaf. What is payroll this Friday? $11,460 for 14 people: kitchen $4,980, front of house $3,720, delivery $1,640, office $1,120. From the copy two nights earlier. Sample data."></picture><noscript><img src="assets/day-0416.webp" width="1160" height="1400" alt="What is payroll this Friday? $11,460 for 14 people. Sample data."></noscript></figure>
   </div>
 </main>
 <footer>
