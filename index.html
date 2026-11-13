@@ -26,13 +26,8 @@
     <rect x="20" y="70" width="12" height="4" fill="#16181D"/>
     <rect x="88" y="70" width="12" height="4" fill="#16181D"/>
   </symbol>
-  <symbol id="arrow" viewBox="0 0 64 16">
-    <path d="M2 8h54" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 6" fill="none"/>
-    <path d="M52 2l8 6-8 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </symbol>
-  <symbol id="lock" viewBox="0 0 24 24">
-    <rect x="4" y="10" width="16" height="12" rx="2" fill="currentColor"/>
-    <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.4" fill="none"/>
+  <symbol id="arrow" viewBox="0 0 24 24">
+    <path d="M4 12h15M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </symbol>
   <symbol id="moon" viewBox="0 0 24 24">
     <path d="M15.5 3.5a8.5 8.5 0 1 0 5 15.2A9 9 0 0 1 15.5 3.5z" fill="currentColor"/>
@@ -59,78 +54,62 @@
       <p class="status"><svg class="st-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="#1E4A3A"/><circle cx="12" cy="12" r="10" stroke="#1E4A3A" stroke-width="2" fill="none"/></svg><span><strong>Where it stands:</strong> works today on <span class="nw">made-up</span> sample records. No real app is connected yet.</span></p>
       <p class="act"><a class="btn" href="mailto:hello@kepthold.com">Email us to hear when it is ready</a><span class="addr">hello@kepthold.com</span></p>
     </div>
-    <figure class="mini" aria-label="How it works: apps you rent are copied every night to your computer. You ask, and get the answer with the records behind it.">
-      <div class="mini-rent">
-        <span class="mcap mcap-rent">Apps you rent</span>
-        <span class="mtile">Invoicing</span><span class="mtile">Bookings</span><span class="mtile">Payroll</span>
+    <figure class="duo" aria-label="Apps you rent are copied every night to Yours, your computer. You ask, and get the answer with the records behind it.">
+      <div class="duo-rent paper">
+        <span class="duo-cap">Apps you rent</span>
+        <span class="drow">Invoicing</span><span class="drow">Bookings</span><span class="drow">Payroll</span>
       </div>
-      <div class="mini-perf perf" aria-hidden="true"></div>
-      <div class="mini-yours">
-        <span class="mcap mcap-yours">Yours</span>
-        <div class="mini-link"><svg class="mmoon" viewBox="0 0 24 24" aria-hidden="true"><use href="#moon"/></svg><span class="mlab">every night</span><svg class="marrow" viewBox="0 0 64 16" aria-hidden="true"><use href="#arrow"/></svg></div>
-        <div class="mini-box"><svg viewBox="0 0 120 84" aria-hidden="true"><use href="#box"/></svg><span class="mcap">Your computer</span></div>
-        <div class="mini-link"><span class="mlab">you ask</span><svg class="marrow" viewBox="0 0 64 16" aria-hidden="true"><use href="#arrow"/></svg></div>
-        <div class="mini-ans">
-          <span class="mans"><b>4 customers owe $6,320</b>
+      <div class="duo-perf perf" aria-hidden="true"><span class="tag"><svg viewBox="0 0 24 24"><use href="#moon"/></svg>every night</span></div>
+      <div class="duo-yours sheet">
+        <span class="duo-cap">Yours</span>
+        <div class="duo-body">
+          <div class="duo-pc"><svg viewBox="0 0 120 84" aria-hidden="true"><use href="#box"/></svg><span>Your computer</span></div>
+          <div class="duo-ans">
+            <b>4 customers owe $6,320</b>
             <span class="mrec"><span>Northgate Plumbing</span><span>$2,940</span></span>
             <span class="mrec"><span>Harbour Lane Bakery</span><span>$1,860</span></span>
             <span class="mrec"><span>Riverside Dental</span><span>$1,040</span></span>
             <span class="mrec"><span>Ashford Print Works</span><span>$480</span></span>
-          </span>
-          <span class="mcap">A sample answer, with its records</span>
+            <i>A sample answer, with its records</i>
+          </div>
         </div>
       </div>
     </figure>
   </div>
 </section>
 
-<section class="problem wrap" aria-labelledby="h-problem">
-  <div class="pr-text">
-    <h2 id="h-problem">One question, three logins</h2>
-    <p class="lead">Your records are scattered across apps you rent. One question can mean 3 logins. When an app goes down, the answer goes with it.</p>
-  </div>
-  <div class="signins" aria-hidden="true">
-    <div class="signin"><b>Invoicing</b><svg viewBox="0 0 24 24"><use href="#lock"/></svg><span>Signed out</span></div>
-    <div class="signin"><b>Bookings</b><svg viewBox="0 0 24 24"><use href="#lock"/></svg><span>Signed out</span></div>
-    <div class="signin"><b>Payroll</b><svg viewBox="0 0 24 24"><use href="#lock"/></svg><span>Signed out</span></div>
-  </div>
-</section>
-
-<section class="how" id="how" aria-labelledby="h-how">
-  <div class="wrap">
-    <h2 id="h-how">How it works, in 3 steps</h2>
-    <ol class="steps">
-      <li class="step">
-        <div class="pic pic-copy" aria-hidden="true">
-          <div class="sheets"><span class="sheet">Invoicing</span><span class="sheet">Bookings</span><span class="sheet">Payroll</span></div>
-          <div class="night"><svg viewBox="0 0 24 24"><use href="#moon"/></svg><svg class="parrow" viewBox="0 0 64 16"><use href="#arrow"/></svg><span class="fly f1"></span><span class="fly f2"></span><span class="fly f3"></span></div>
+<section class="how wrap" id="how" aria-labelledby="h-how">
+  <p class="problem">Your records are scattered across apps you rent. One question can mean 3 logins. When an app goes down, the answer goes with it.</p>
+  <h2 id="h-how">Every night it copies. When you ask, it answers.</h2>
+  <ol class="flow">
+    <li class="part">
+      <div class="pic grey" aria-hidden="true">
+        <div class="stack"><span class="mini-sheet">Invoicing</span><span class="mini-sheet">Bookings</span><span class="mini-sheet">Payroll</span></div>
+      </div>
+      <div class="txt"><h3>Copy</h3><p>Every night, Kepthold copies what is new from your apps.</p></div>
+    </li>
+    <li class="part">
+      <div class="pic green" aria-hidden="true">
+        <div class="perf"><span class="tag"><svg viewBox="0 0 24 24"><use href="#moon"/></svg>every night</span></div>
+        <svg class="kbox" viewBox="0 0 120 84"><use href="#box"/></svg>
+        <div class="files"><span class="file">Invoices</span><span class="file">Bookings</span><span class="file">Payroll</span></div>
+      </div>
+      <div class="txt"><h3>Keep</h3><p>The copy lives on your computer, in plain files that open without Kepthold. If you stop using us, you keep them.</p></div>
+    </li>
+    <li class="part">
+      <div class="pic green end" aria-hidden="true">
+        <span class="join"><svg viewBox="0 0 24 24"><use href="#arrow"/></svg></span>
+        <p class="paper-q">Who owes us for more than 30 days?</p>
+        <div class="paper-a"><b>4 customers owe $6,320.</b>
+          <span class="arec"><span>Northgate Plumbing</span><span>$2,940</span></span>
+          <span class="arec"><span>Harbour Lane Bakery</span><span>$1,860</span></span>
+          <span class="arec"><span>Riverside Dental</span><span>$1,040</span></span>
+          <span class="arec"><span>Ashford Print Works</span><span>$480</span></span>
         </div>
-        <h3>Copy</h3>
-        <p>Every night, Kepthold copies what is new from your apps.</p>
-      </li>
-      <li class="step">
-        <div class="pic pic-keep" aria-hidden="true">
-          <svg class="kbox" viewBox="0 0 120 84"><use href="#box"/></svg>
-          <div class="files"><span class="file">Invoices</span><span class="file">Bookings</span><span class="file">Payroll</span></div>
-        </div>
-        <h3>Keep</h3>
-        <p>The copy lives on your computer, in plain files that open without Kepthold. If you stop using us, you keep them.</p>
-      </li>
-      <li class="step">
-        <div class="pic pic-ask" aria-hidden="true">
-          <p class="paper-q">Who owes us for more than 30 days?</p>
-          <div class="paper-a"><b>4 customers owe $6,320.</b>
-            <span class="arec"><span>Northgate Plumbing</span><span>$2,940</span></span>
-            <span class="arec"><span>Harbour Lane Bakery</span><span>$1,860</span></span>
-            <span class="arec"><span>Riverside Dental</span><span>$1,040</span></span>
-            <span class="arec"><span>Ashford Print Works</span><span>$480</span></span>
-          </div>
-        </div>
-        <h3>Ask</h3>
-        <p>You ask in plain words, like “Who owes us for more than 30 days?” You get the answer and the list of records behind it, so you can check it.</p>
-      </li>
-    </ol>
-  </div>
+      </div>
+      <div class="txt"><h3>Ask</h3><p>You ask in plain words, like “Who owes us for more than 30 days?” You get the answer and the list of records behind it, so you can check it.</p></div>
+    </li>
+  </ol>
 </section>
 
 <section class="try wrap" id="try" aria-labelledby="h-try">
@@ -138,102 +117,114 @@
   <p class="lead"><span class="js-only">This is a made-up business. Ask the question. Then switch the invoicing app off and ask again.</span><span class="nojs-only">This is a made-up business. Below, the same question twice: first with the invoicing app working, then with it switched off.</span></p>
 
   <div class="bench" id="bench" data-asked="1" data-open="1" data-off="0">
-    <div class="t-rent">
-      <div class="t-head"><span class="zone">An app you rent</span>
-        <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Invoicing app power" id="sw"><span class="knob"></span><span class="sw-on">On</span><span class="sw-off">Off</span></button><span class="on-word">On</span>
-      </div>
-      <p class="app-name">Invoicing</p>
-      <p class="app-state"><span class="ok">Working</span><span class="down">Not responding since 08:12</span></p>
-      <ul class="inv">
-        <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
-        <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
-        <li><span>Riverside Dental</span><span class="amt">$1,040</span></li>
-        <li><span>Ashford Print Works</span><span class="amt">$480</span></li>
-      </ul>
+    <div class="ctl">
+      <span class="zone">Invoicing, an app you rent</span>
+      <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Invoicing app power" id="sw"><span class="knob"></span><span class="sw-on">On</span><span class="sw-off">Off</span></button><span class="on-word">On</span>
     </div>
-    <div class="t-perf perf" aria-hidden="true"></div>
-    <div class="t-yours">
-      <span class="zone">Your computer</span>
-      <div class="q-row">
-        <div class="q-paper"><span class="q-tag">Sample question</span><p class="q-text">Who owes us for more than 30 days?</p></div>
-        <button class="btn btn-ask" type="button" id="ask">Ask</button>
+    <div class="pad">
+      <div class="t-rent">
+        <div class="paper" id="paper">
+          <span class="zone">An app you rent</span>
+          <p class="app-name">Invoicing</p>
+          <p class="app-state"><span class="ok">Working</span></p>
+          <ul class="inv">
+            <li class="inv-h"><span>Customer</span><span>Owed</span></li>
+            <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
+            <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
+            <li><span>Riverside Dental</span><span class="amt">$1,040</span></li>
+            <li><span>Ashford Print Works</span><span class="amt">$480</span></li>
+          </ul>
+        </div>
+        <div class="gone"><p class="g-name">Invoicing</p><p class="g-state">Not responding since 08:12</p></div>
       </div>
-      <div class="answer" aria-live="polite">
-        <p class="wait">The answer shows here, with the records behind it.</p>
-        <div class="ans-card">
-          <p class="still"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#tick"/></svg><span><b>Copy: still answers.</b> From last night's copy.</span></p>
-          <p class="ans-big">4 customers owe $6,320.</p>
-          <p class="ans-src"><span class="src-copy">From last night's copy. </span>Sample data.</p>
-          <button class="btn-rec" type="button" id="rec" aria-expanded="true" aria-controls="records"><span class="r-show">Show the records behind it</span><span class="r-hide">Hide the records</span></button>
-          <div class="records" id="records">
-            <div class="rec-in">
-              <table>
-                <caption>The records behind the answer. Sample data.</caption>
-                <thead><tr><th scope="col">Customer</th><th scope="col">Days</th><th scope="col">Owed</th></tr></thead>
-                <tbody>
-                  <tr><td>Northgate Plumbing</td><td>47 days</td><td>$2,940</td></tr>
-                  <tr><td>Harbour Lane Bakery</td><td>38 days</td><td>$1,860</td></tr>
-                  <tr><td>Riverside Dental</td><td>33 days</td><td>$1,040</td></tr>
-                  <tr><td>Ashford Print Works</td><td>31 days</td><td>$480</td></tr>
-                </tbody>
-                <tfoot><tr><td>Total</td><td></td><td>$6,320</td></tr></tfoot>
-              </table>
+      <div class="t-perf perf" aria-hidden="true"><span class="stub"></span></div>
+      <div class="t-yours sheet">
+        <span class="zone">Your computer</span>
+        <div class="q-row">
+          <div class="q-paper"><span class="q-tag">Sample question</span><p class="q-text">Who owes us for more than 30 days?</p></div>
+          <button class="btn btn-ask" type="button" id="ask">Ask</button>
+        </div>
+        <div class="answer" aria-live="polite">
+          <div class="blank"><p>Press Ask</p></div>
+          <div class="ans-card">
+            <p class="still"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#tick"/></svg><span>Still answers, from last night's copy.</span></p>
+            <p class="ans-big">4 customers owe $6,320.</p>
+            <p class="ans-src"><span class="src-copy">From last night's copy. </span>Sample data.</p>
+            <button class="btn-rec" type="button" id="rec" aria-expanded="true" aria-controls="records"><span class="r-show">Show the records behind it</span><span class="r-hide">Hide the records</span></button>
+            <div class="records" id="records">
+              <div class="rec-in">
+                <table>
+                  <caption>The records behind the answer</caption>
+                  <thead><tr><th scope="col">Customer</th><th scope="col">Days</th><th scope="col">Owed</th></tr></thead>
+                  <tbody>
+                    <tr><td>Northgate Plumbing</td><td>47 days</td><td>$2,940</td></tr>
+                    <tr><td>Harbour Lane Bakery</td><td>38 days</td><td>$1,860</td></tr>
+                    <tr><td>Riverside Dental</td><td>33 days</td><td>$1,040</td></tr>
+                    <tr><td>Ashford Print Works</td><td>31 days</td><td>$480</td></tr>
+                  </tbody>
+                  <tfoot><tr><td>Total</td><td></td><td>$6,320</td></tr></tfoot>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="t-bad">
-      <h3>On a bad day</h3>
-      <p>If an app goes down, raises its price or shuts down, your copy answers with what it had last night.</p>
-      <p class="limit">Kepthold does not replace the app. It keeps your records and your answers.</p>
     </div>
   </div>
   <script>(function(){var b=document.getElementById('bench');b.dataset.asked='0';b.dataset.open='0';document.getElementById('rec').setAttribute('aria-expanded','false');})();</script>
 
   <noscript>
     <div class="bench still-off" data-asked="1" data-open="0" data-off="1">
-      <div class="t-rent">
-        <div class="t-head"><span class="zone">An app you rent</span><span class="off-word">Off</span></div>
-        <p class="app-name">Invoicing</p>
-        <p class="app-state"><span class="ok">Working</span><span class="down">Not responding since 08:12</span></p>
-        <ul class="inv">
-          <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
-          <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
-          <li><span>Riverside Dental</span><span class="amt">$1,040</span></li>
-          <li><span>Ashford Print Works</span><span class="amt">$480</span></li>
-        </ul>
-      </div>
-      <div class="t-perf perf" aria-hidden="true"></div>
-      <div class="t-yours">
-        <span class="zone">Your computer</span>
-        <div class="q-row"><div class="q-paper"><span class="q-tag">Sample question</span><p class="q-text">Who owes us for more than 30 days?</p></div></div>
-        <div class="answer"><div class="ans-card">
-          <p class="still"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#tick"/></svg><span><b>Copy: still answers.</b> From last night's copy.</span></p>
-          <p class="ans-big">4 customers owe $6,320.</p>
-          <p class="ans-src">Sample data.</p>
-        </div></div>
+      <div class="ctl"><span class="zone">Invoicing, an app you rent</span><span class="off-word">Off</span></div>
+      <div class="pad">
+        <div class="t-rent">
+          <div class="paper" aria-hidden="true">
+            <span class="zone">An app you rent</span>
+            <p class="app-name">Invoicing</p>
+            <p class="app-state"><span class="ok">Working</span></p>
+            <ul class="inv">
+              <li class="inv-h"><span>Customer</span><span>Owed</span></li>
+              <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
+              <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
+              <li><span>Riverside Dental</span><span class="amt">$1,040</span></li>
+              <li><span>Ashford Print Works</span><span class="amt">$480</span></li>
+            </ul>
+          </div>
+          <div class="gone"><p class="g-name">Invoicing</p><p class="g-state">Not responding since 08:12</p></div>
+        </div>
+        <div class="t-perf perf" aria-hidden="true"><span class="stub"></span></div>
+        <div class="t-yours sheet">
+          <span class="zone">Your computer</span>
+          <div class="q-row"><div class="q-paper"><span class="q-tag">Sample question</span><p class="q-text">Who owes us for more than 30 days?</p></div></div>
+          <div class="answer"><div class="ans-card">
+            <p class="still"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#tick"/></svg><span>Still answers, from last night's copy.</span></p>
+            <p class="ans-big">4 customers owe $6,320.</p>
+            <p class="ans-src">Sample data.</p>
+          </div></div>
+        </div>
       </div>
     </div>
   </noscript>
+
+  <div class="t-bad">
+    <div>
+      <h3>On a bad day</h3>
+      <p>If an app goes down, raises its price or shuts down, your copy answers with what it had last night.</p>
+    </div>
+    <p class="limit">Kepthold does not replace the app. It keeps your records and your answers.</p>
+  </div>
 </section>
 
 <section class="private wrap" aria-labelledby="h-private">
-  <div class="pv-pic" aria-hidden="true">
-    <svg class="pv-box" viewBox="0 0 120 84"><use href="#box"/></svg>
-    <p class="pv-cap">Your question is read on this computer, in your office.</p>
-  </div>
-  <div class="pv-text">
-    <h2 id="h-private">Your copy stays in your office</h2>
-    <p class="lead">The part that reads your question runs on your own computer, so no outside AI service sees your payroll or your customers.</p>
-  </div>
+  <h2 id="h-private">Your copy stays in your office</h2>
+  <p class="lead">The part that reads your question runs on your own computer, so no outside AI service sees your payroll or your customers.</p>
 </section>
 
 <section class="close" aria-labelledby="h-close">
   <div class="wrap close-in">
-    <p class="vision">Own your records, even while you rent the apps.</p>
+    <h2 class="vision">Own your records, even while you rent the apps.</h2>
     <div class="stands">
-      <h2 id="h-close">Where it stands</h2>
+      <h3 id="h-close">Where it stands</h3>
       <p>Kepthold works today on <span class="nw">made-up</span> sample records. No real app is connected yet. Write to hello@kepthold.com and we will tell you when it is ready.</p>
       <p class="act"><a class="btn" href="mailto:hello@kepthold.com">Email us to hear when it is ready</a></p>
     </div>
@@ -243,7 +234,6 @@
 </main>
 <footer class="foot wrap">
   <p><b>Kepthold</b></p>
-  <p>Every name and number on this page is made-up sample data.</p>
 </footer>
 <script src="site.js" defer></script>
 </body>

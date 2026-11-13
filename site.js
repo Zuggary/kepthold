@@ -5,6 +5,7 @@
   var ask = document.getElementById('ask');
   var rec = document.getElementById('rec');
   var sw = document.getElementById('sw');
+  var paper = document.getElementById('paper');
 
   function play(cls) {
     if (reduce) return;
@@ -33,15 +34,8 @@
     var off = b.dataset.off !== '1';
     b.dataset.off = off ? '1' : '0';
     sw.setAttribute('aria-checked', off ? 'false' : 'true');
+    if (off) { paper.setAttribute('aria-hidden', 'true'); paper.setAttribute('inert', ''); }
+    else { paper.removeAttribute('aria-hidden'); paper.removeAttribute('inert'); }
     play(off ? 'tearing' : 'mending');
   });
-
-  if (reduce || !('IntersectionObserver' in window)) return;
-  var io = new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (e.isIntersecting) { e.target.classList.add('play'); io.unobserve(e.target); }
-    });
-  }, { threshold: 0.4 });
-  var s = document.querySelector('.steps');
-  if (s) io.observe(s);
 })();
