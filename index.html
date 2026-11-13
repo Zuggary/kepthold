@@ -44,7 +44,7 @@
   --kept-deep: #1E4A3A;
   --down: #474C52;
   --muted: #3C433F;
-  --pencil: #5C605B;
+  --pencil: #4A4F4A;
   --vermilion: #C8321E;
   --serif: "Besley", "Besley Fallback", Georgia, serif;
   --sans: "Schibsted Grotesk", "Schibsted Fallback", Arial, sans-serif;
@@ -79,7 +79,7 @@ h1 .up { color: var(--kept-deep); }
 .after { display: inline-flex; align-items: center; gap: 20px; }
 .undo { font: 400 15px/24px var(--sans); color: var(--muted); text-underline-offset: 3px; text-decoration-thickness: 1px; white-space: nowrap; }
 .undo:hover { color: var(--ink); }
-.addr { position: absolute; left: 0; top: calc(100% + 6px); font: 400 13px/16px var(--sans); color: var(--muted); white-space: nowrap; letter-spacing: .005em; }
+.addr { position: absolute; left: 0; top: calc(100% + 14px); font: 400 15px/20px var(--sans); color: var(--muted); white-space: nowrap; letter-spacing: .005em; }
 .act[hidden], .after[hidden] { display: none; }
 html:not(.js) .hero:target .act.tear { display: none; }
 html:not(.js) .hero:target .after { display: inline-flex; }
@@ -101,13 +101,12 @@ html:not(.gl).is-torn .revealed, html:not(.js) .hero:target .revealed { opacity:
 html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: hidden; }
 .live .poster, .live .revealed { visibility: hidden; }
 .gl-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; pointer-events: none; }
-.flying .gl-scene { z-index: 5; }   /* the torn sheet falls toward the viewer, in front of the words and the button */
 .handle { position: absolute; width: 104px; height: 104px; left: calc(99.43% - 78px); top: calc(97.95% - 78px); z-index: 3; display: none;
   touch-action: pan-y; cursor: grab; -webkit-tap-highlight-color: transparent; }
 .live .handle { display: block; }
 .handle.held { cursor: grabbing; }
 /* a pencilled note on the ground beside the corner */
-.note { position: absolute; z-index: 3; right: 0; top: calc(100% + 12px); font: 400 15px/20px var(--sans); color: var(--pencil);
+.note { position: absolute; z-index: 3; right: 0; top: calc(100% + 12px); font: 400 16px/20px var(--sans); color: var(--pencil);
   white-space: nowrap; pointer-events: none; transition: opacity .2s linear; letter-spacing: .005em; }
 .still .note, html:not(.js) .note { display: none; }
 .flat .pin { height: auto !important; }
@@ -120,14 +119,14 @@ html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: 
   .gl .pin { height: 230svh; }
   .gl .hero { position: sticky; top: 0; }
   .frame { width: calc(1440 * var(--u)); height: calc(900 * var(--u)); }
-  .hero .brand { position: absolute; left: calc(64 * var(--u)); top: calc(30 * var(--u)); }
+  .hero .brand { position: absolute; left: calc(104 * var(--u)); top: calc(36 * var(--u)); }
   /* the words are one block, set against the pad's middle: headline, 48 under it the sentence, then the action */
-  .words { position: absolute; left: calc(64 * var(--u)); top: calc(196 * var(--u)); width: calc(620 * var(--u)); }
-  h1 { font-size: calc(72 * var(--u)); line-height: calc(80 * var(--u)); }
-  .support { margin-top: calc(48 * var(--u)); width: calc(470 * var(--u));
+  .words { position: absolute; left: calc(104 * var(--u)); top: calc(206 * var(--u)); width: calc(600 * var(--u)); }
+  h1 { font-size: calc(80 * var(--u)); line-height: calc(90 * var(--u)); }
+  .support { margin-top: calc(36 * var(--u)); width: calc(470 * var(--u));
     font-size: max(17px, calc(19 * var(--u))); line-height: max(26px, calc(29 * var(--u))); }
   .acts { margin-top: calc(40 * var(--u)); }
-  .padbox { left: calc(748 * var(--u)); top: calc(112 * var(--u)); width: calc(526 * var(--u)); }
+  .padbox { left: calc(724 * var(--u)); top: calc(74 * var(--u)); width: calc(600 * var(--u)); }
 }
 
 /* ================= phone and narrow: words, the pad, then the action under the thumb ================= */
@@ -135,15 +134,15 @@ html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: 
   .hero { min-height: 560px; display: flex; flex-direction: column; }
   .gl .pin { height: 220svh; }
   .gl .hero { position: sticky; top: 0; }
-  .frame { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; padding: 18px 16px 24px; }
+  .frame { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; padding: 18px 16px 52px; }
   .brand .name { font-size: 21px; }
-  h1 { margin-top: 28px; font-size: min(29px, 7.6vw); line-height: 1.18; }
+  h1 { margin-top: 24px; font-size: min(33px, 8.7vw); line-height: 1.12; }
   .support { margin-top: 12px; font-size: 15px; line-height: 21px; max-width: 34em; }
   .words { display: contents; }
-  .stage { position: relative; flex: 1; min-height: 0; margin-top: 24px; container-type: size; order: 4; }
+  .stage { position: relative; flex: 0 1 auto; aspect-ratio: 526 / 682; min-height: 0; margin-top: 20px; container-type: size; order: 4; }
   .acts { order: 5; }
-  .padbox { left: 50%; bottom: 0; transform: translateX(-50%); width: min(100cqw, 100cqh * 0.77126); }
-  .acts { margin-top: 16px; min-height: 46px; }
+  .padbox { left: 50%; top: 0; transform: translateX(-50%); width: min(100cqw, 100cqh * 0.77126); }
+  .acts { margin-top: 18px; min-height: 46px; }
   .act { height: 46px; line-height: 46px; padding: 0 20px; }
   .after { gap: 16px; }
   .note { top: calc(100% + 29px); }
