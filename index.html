@@ -119,14 +119,14 @@ html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: 
   .gl .pin { height: 230svh; }
   .gl .hero { position: sticky; top: 0; }
   .frame { width: calc(1440 * var(--u)); height: calc(900 * var(--u)); }
-  .hero .brand { position: absolute; left: calc(104 * var(--u)); top: calc(36 * var(--u)); }
+  .hero .brand { position: absolute; left: calc(96 * var(--u)); top: calc(36 * var(--u)); }
   /* the words are one block, set against the pad's middle: headline, 48 under it the sentence, then the action */
-  .words { position: absolute; left: calc(104 * var(--u)); top: calc(206 * var(--u)); width: calc(600 * var(--u)); }
-  h1 { font-size: calc(80 * var(--u)); line-height: calc(90 * var(--u)); }
+  .words { position: absolute; left: calc(96 * var(--u)); top: calc(222 * var(--u)); width: calc(672 * var(--u)); }
+  h1 { font-size: calc(64 * var(--u)); line-height: calc(74 * var(--u)); }
   .support { margin-top: calc(36 * var(--u)); width: calc(470 * var(--u));
     font-size: max(17px, calc(19 * var(--u))); line-height: max(26px, calc(29 * var(--u))); }
   .acts { margin-top: calc(40 * var(--u)); }
-  .padbox { left: calc(724 * var(--u)); top: calc(74 * var(--u)); width: calc(600 * var(--u)); }
+  .padbox { left: calc(784 * var(--u)); top: calc(84 * var(--u)); width: calc(560 * var(--u)); }
 }
 
 /* ================= phone and narrow: words, the pad, then the action under the thumb ================= */
@@ -134,14 +134,14 @@ html:not(.gl).is-torn .poster, html:not(.js) .hero:target .poster { visibility: 
   .hero { min-height: 560px; display: flex; flex-direction: column; }
   .gl .pin { height: 220svh; }
   .gl .hero { position: sticky; top: 0; }
-  .frame { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; padding: 18px 16px 52px; }
+  .frame { flex: 1; min-height: 0; display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; padding: 16px 16px 44px; }
   .brand .name { font-size: 21px; }
-  h1 { margin-top: 24px; font-size: min(33px, 8.7vw); line-height: 1.12; }
+  h1 { margin-top: 20px; font-size: min(32px, 8.4vw); line-height: 1.12; }
   .support { margin-top: 12px; font-size: 15px; line-height: 21px; max-width: 34em; }
   .words { display: contents; }
-  .stage { position: relative; flex: 0 1 auto; aspect-ratio: 526 / 682; min-height: 0; margin-top: 20px; container-type: size; order: 4; }
+  .stage { position: relative; flex: 0 1 auto; aspect-ratio: 526 / 682; min-height: 0; margin-top: 16px; container-type: size; order: 4; }
   .acts { order: 5; }
-  .padbox { left: 50%; top: 0; transform: translateX(-50%); width: min(100cqw, 100cqh * 0.77126); }
+  .padbox { left: 0; top: 0; width: min(100cqw, 100cqh * 0.77126); }
   .acts { margin-top: 18px; min-height: 46px; }
   .act { height: 46px; line-height: 46px; padding: 0 20px; }
   .after { gap: 16px; }

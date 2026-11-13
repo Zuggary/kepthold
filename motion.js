@@ -596,25 +596,11 @@ function idTexture(boxes) {   // each printed item of the copy as a flat block o
   for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.NEAREST], [gl.TEXTURE_MAG_FILTER, gl.NEAREST], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
   return t;
 }
-function updateVis(tp) {   // which items of the copy the top sheet still covers, read from a small coverage render
-  const w = cov.w, h = cov.h;
-  gl.bindFramebuffer(gl.FRAMEBUFFER, cov.f); gl.viewport(0, 0, w, h);
-  gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.disable(gl.BLEND);
-  drawSheets(2, st.p, tp);
-  gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, cov.buf);
-  const k = CAM_D / (CAM_D - Z_GREEN), sx = w / view.W, sy = h / view.H;
-  const X = u => (view.ox + (CAM[0] + (u - CAM[0]) * k) * view.s) * sx, Y = v => (view.oy + (CAM[1] + (v - CAM[1]) * k) * view.s) * sy;
-  let moving = false;
-  wordsCopy.slice(0, 48).forEach(([x0, y0, x1, y1], i) => {
-    const a0 = Math.max(0, Math.floor(X(x0 - 3))), a1 = Math.min(w - 1, Math.ceil(X(x1 + 3)));
-    const b0 = Math.max(0, Math.floor(Y(y0 - 3))), b1 = Math.min(h - 1, Math.ceil(Y(y1 + 3)));
-    let covered = false;
-    for (let yy = b0; yy <= b1 && !covered; yy++) { const row = (h - 1 - yy) * w; for (let xx = a0; xx <= a1; xx++) if (cov.buf[(row + xx) * 4 + 3] > 0) { covered = true; break; } }
-    const v = st.vis[i];
-    st.vis[i] = covered ? 0 : Math.min(1, v + st.dt / 110);   // hidden at once while covered; inks in quickly once wholly clear
-    if (st.vis[i] !== v && st.vis[i] < 1 && !covered) moving = true;
-  });
-  st.visMoving = moving;
+function updateVis() {   // the copy's print, all at once: none while the sheet is attached, all once it is torn free
+  const target = st.p >= T_TORN - 0.004 ? 1 : 0, v = (FIXED !== null || st.dbg) ? target : st.vis[0];
+  const nv = target ? Math.min(1, v + st.dt / 90) : 0;   // a 90 ms ease in, which nobody sees, under the leaving sheet
+  st.vis.fill(nv);
+  st.visMoving = nv > 0 && nv < 1;
 }
 function drawApp(phone) {         // the grey top sheet: the invoicing app's page, printed on coated stock
   const { cv, c } = inkCanvas();
@@ -650,7 +636,7 @@ function drawApp(phone) {         // the grey top sheet: the invoicing app's pag
 }
 
 // ---------------------------------------------------------------- state
-let inkIds = null, cov = null, phone = false, view = null, inkCopy = null, inkApp = null, wordsCopy = null, wordsApp = null, need = true;
+let inkIds = null, phone = false, view = null, inkCopy = null, inkApp = null, wordsCopy = null, wordsApp = null, need = true;
 let paperTex, edgeTex, meshBoard, meshStack, meshGreen, meshFringe, meshBind, meshTop;
 let maps = null;   // shadow map pyramid
 let DBG = null;    // 'app' | 'copy': tools/inkcheck.py draws one sheet alone
@@ -688,8 +674,7 @@ function resize() {
   if (maps) for (const m of maps.list) { gl.deleteTexture(m.t); gl.deleteFramebuffer(m.f); }
   const list = [0, 1, 2, 3, 4, 5, 6].map(() => mkTarget(mw, mh));
   maps = { w: mw, h: mh, k: mk, list, S: list.slice(0, 6), tmp: list[6] };
-  if (cov) { gl.deleteTexture(cov.t); gl.deleteFramebuffer(cov.f); }
-  { const w = Math.max(4, Math.round(view.W / 3)), h = Math.max(4, Math.round(view.H / 3)); cov = { ...mkTarget(w, h), w, h, buf: new Uint8Array(w * h * 4) }; }
+
   need = true;
 }
 function buildInk() {
@@ -698,7 +683,7 @@ function buildInk() {
   WORDS = []; inkCopy = tex(drawCopy(phone, slip), true, gl.CLAMP_TO_EDGE); wordsCopy = WORDS;   // the boxes, for tools/inkcheck.py
   WORDS = []; inkApp = tex(drawApp(phone), true, gl.CLAMP_TO_EDGE); wordsApp = WORDS;
   if (inkIds) gl.deleteTexture(inkIds);
-  inkIds = idTexture(wordsCopy); st.vis = new Float32Array(48).fill(1);
+  inkIds = idTexture(wordsCopy); st.vis = new Float32Array(48).fill(0);
   WORDS = null;
 }
 function buildMeshes() {
@@ -744,12 +729,13 @@ const endL = d => d <= PW ? [PW - d, PH] : [0, PH - (d - PW)];   // along the bo
 const endR = d => [PW, PH - d];
 function tearParams(p, aoff = 0) {
   let lift = 0, front = PW + 2, pull = [0, 0, 0, 0], fly = null, open = [1, 0, 0, 0];
-  const t = clamp(p / PA), e = 0.25 * t + 0.75 * ease(t);
-  // the resting corner: long along the bottom margin and low up the side, so it stays in the margin under the Total row
-  const dL0 = phone ? 232 : 240, dR0 = phone ? 84 : 86;
-  const g = smooth(PA, T_TORN, p);   // the corner keeps curling a little while the hand lifts
-  const dL = lerp(dL0, 360, e) + 30 * g, dR = lerp(dR0, 270, e) + 20 * g;
-  const R = lerp(33, 35, Math.pow(t, 0.7)), k = lerp(-0.12, -0.06, t);
+  // the peel: from rest to the strain the corner curl alone grows, steadily from the first step (the held sheet stays flat)
+  const t = clamp(p / P_TH), e = 0.45 * t + 0.55 * ease(t);
+  // the resting corner: long along the bottom margin and low up the side
+  const dL0 = phone ? 262 : 244, dR0 = phone ? 100 : 88;
+  const g = smooth(P_TH, T_TORN, p);   // in the rip the corner curls a little more as the sheet goes
+  const dL = lerp(dL0, 400, e) + 24 * g, dR = lerp(dR0, 300, e) + 16 * g;
+  const R = lerp(phone ? 38 : 33, 37, t), k = lerp(-0.12, -0.06, t);
   let { nn, c } = foldFrom(endL(dL), endR(dR));
   if (aoff) {                                    // the drag direction turns the curl a little about its middle
     const m = [(endL(dL)[0] + endR(dR)[0]) / 2, (endL(dL)[1] + endR(dR)[1]) / 2];
@@ -757,18 +743,18 @@ function tearParams(p, aoff = 0) {
     nn = [Math.cos(a), Math.sin(a)]; c = nn[0] * m[0] + nn[1] * m[1];
   }
   // the lift: the sheet bends up off the pad about a hinge line that climbs from the bottom to just under the perforation
-  const tl = smooth(PA, T_LIFT + 0.03, p);
+  const tl = smooth(P_TH, T_TORN, p);            // only in the rip: the sheet bends up off the pad as it is pulled away
   const hinge = lerp(PH - 10, 26, Math.pow(tl, 0.8));
-  let phiMax = 0.74 * smooth(PA, T_LIFT, p) + 0.2 * smooth(T_LIFT, T_TORN, p);   // the bend at the bottom edge, radians
-  lift = 2.4 * smooth(T_LIFT - 0.06, T_LIFT, p) * (1 - smooth(T_TORN - 0.03, T_TORN + 0.01, p));   // tension along the perforation
-  if (p >= T_LIFT) {
-    const tt = clamp((p - T_LIFT) / (T_TORN - T_LIFT));
+  let phiMax = 0.6 * tl;                          // the bend at the bottom edge, radians
+  lift = 1.4 * smooth(P_TH - 0.1, P_TH, p) * (1 - smooth(T_TORN - 0.03, T_TORN + 0.01, p));   // tension along the perforation
+  if (p >= P_TH) {
+    const tt = clamp((p - P_TH) / (T_TORN - P_TH));
     let f = PW * (1 - (0.2 * tt + 0.8 * ease(tt)));
     const kk = f / PITCH, fr = kk - Math.floor(kk);
     f = (Math.floor(kk) + smooth(0.3, 0.8, fr)) * PITCH;   // it hangs on each bridge, then lets go
     front = tt >= 1 ? -2 : f;
-    pull[3] = 4.5 * smooth(0, 0.3, tt);                      // the torn top edge springs up off the stub
-    pull[2] = 8 * smooth(0, 0.25, tt);                       // and draws back from it: a clean gap, not two edges over each other
+    pull[3] = 0;                                             // the torn top edge stays down on the pad: no lifted sliver
+    pull[2] = 5 * smooth(0, 0.25, tt);                       // and draws back from it: a clean gap, not two edges over each other
   }
   let fade = 0;
   if (p > T_TORN) {
@@ -780,7 +766,7 @@ function tearParams(p, aoff = 0) {
     const th = 1.5 * (0.35 * tf + 0.65 * ease(clamp(tf / 0.85)));   // a steady turn over the whole span
     phiMax = lerp(phiMax, 0.12, ease(clamp(tf / 0.3)));   // it keeps only a faint curve
     open = [R, k, 5000, 0.9 * ease(clamp(tf / 0.3))];       // and the corner curl springs open
-    pull[3] = lerp(4.5, 0, e1); pull[2] = 8;
+    pull[3] = 0; pull[2] = 5;
     const carry = Math.pow(smooth(0.34, 0.97, tf), 1.8);
     fly = { pitch: th, yaw: 0.12 * smooth(0.4, 1, tf), roll: -0.20 * smooth(0.4, 1, tf),
             t: [(phone ? 820 : 800) * carry, -8 * smooth(0, 0.4, tf), 36 * smooth(0, 0.3, tf)] };
@@ -910,7 +896,7 @@ function drawSheets(pass, P, tp) {
     gl.uniform1f(g.uFly, f); };
   // once it is free and thinning out, the sheet is drawn after the binding, so the binding shows through it, never cut away
   if (tp.fly) bind();
-  if (pass === 0 && st.trail && st.trail.length) {   // motion blur: the sheet a few milliseconds earlier, fainter, under it
+  if (false && pass === 0 && st.trail && st.trail.length) {   // motion blur: the sheet a few milliseconds earlier, fainter, under it
     gl.depthMask(false);
     for (const [pp, al] of st.trail) {
       const tq = tearParams(pp); if (tq.gone || !tq.fly) continue;
@@ -960,7 +946,7 @@ function frame(P) {
   bindShadows(g);
   gl.bindVertexArray(quadVao); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   // 4. the paper (first: which items of the copy are uncovered)
-  if (!SHEET && cov) updateVis(tp);
+  if (!SHEET) updateVis();
   gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height);
   gl.enable(gl.BLEND); gl.blendEquation(gl.FUNC_ADD); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   drawSheets(0, P, tp);
@@ -1100,7 +1086,7 @@ function tick(now) {
     frame(st.p);
     st.frameMs.push(performance.now() - t0); if (st.frameMs.length > 600) st.frameMs.shift();
     need = false;
-    hint.style.opacity = String(1 - smooth(0.165, 0.185, st.p));   // the hint stays through the early peel, then goes at once
+    hint.style.opacity = st.mode === 'peel' && !st.dbg ? '1' : '0';   // the hint is there for the whole peel, gone once the sheet rips
     handle.style.display = st.mode === 'peel' ? '' : 'none';
     setLabel(st.p >= T_SAY);                    // the next step changes only once the sheet has gone
     doc.classList.toggle('is-torn', st.p >= T_SAY);
