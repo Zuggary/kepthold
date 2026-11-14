@@ -232,6 +232,9 @@ html:not(.js) .on-word { display: inline; color: var(--deep); }
 .limit { font: 650 clamp(26px, 2.7vw, 38px)/1.25 var(--serif); text-wrap: balance; }
 .private h2 { font: 650 var(--t4)/1.15 var(--serif); }
 .private p { margin-top: var(--s2); font-size: var(--t2); color: var(--muted); max-width: 30em; }
+.checks { margin-top: var(--s5); }
+.private h3 { font: 700 var(--t3, 22px)/1.25 var(--sans); }
+.proof { font-size: 14px; color: var(--ink); }
 
 /* closing: one more green sheet, perforated at the top */
 .close-sheet { position: relative; padding: var(--s6) 0; background: var(--grain), linear-gradient(180deg, #E8F0EA, #D8E6DC); }
