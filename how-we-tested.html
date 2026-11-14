@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How we tested the sync checks | Kepthold</title>
+<meta name="description" content="What we tested, what the test caught and what it missed. Ten made-up mistakes, nine caught, one missed. Sample data only.">
+<link rel="canonical" href="https://www.kepthold.com/how-we-tested.html">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Kepthold">
+<meta property="og:title" content="How we tested the sync checks">
+<meta property="og:description" content="Ten made-up mistakes, nine caught, one missed. What the test shows and what it does not.">
+<meta property="og:url" content="https://www.kepthold.com/how-we-tested.html">
+<meta property="og:image" content="https://www.kepthold.com/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/Besley-VF.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SchibstedGrotesk-VF.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="top wrap">
+  <a class="brand" href="./" aria-label="Kepthold, front page"><img src="assets/mark.svg" width="28" height="28" alt=""><span>Kepthold</span></a>
+  <a class="toplink" href="./">Front page</a>
+</header>
+
+<main id="top" class="wrap pp">
+  <h1>How we tested the sync checks</h1>
+  <p class="pp-lead">This page says what we tested, what the test caught and what it missed. Every file and number in the test is made-up sample data.</p>
+
+  <h2>The test</h2>
+  <p>Kepthold copies your records every night. The files and settings that do the copying are the part that can go wrong. So we asked a separate test agent, one that had not built the checks, to plant 12 realistic mistakes in those files. These are mistakes a careless person or a helpful program might call "a fix". A second, independent checker then scored the first 10 mistakes that differed from the ones in earlier tests. The checker also re-ran five of them itself.</p>
+
+  <h2>The 10 scored mistakes</h2>
+  <div class="pp-table" role="region" aria-label="The 10 scored mistakes" tabindex="0">
+    <table>
+      <thead><tr><th>#</th><th>What was changed</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Freight amounts rounded to one decimal in a file that fetches orders</td><td>Caught: the file had changed and was not signed</td></tr>
+        <tr><td>2</td><td>Open orders marked as shipped by filling a missing ship date</td><td>Caught: the same file check</td></tr>
+        <tr><td>3</td><td>An older, shorter copy of a saved app file put in before the first copy run</td><td>Caught: the saved-file fingerprint</td></tr>
+        <tr><td>4</td><td>An older copy of another saved file swapped in after a good run</td><td>Caught: the saved-file fingerprint</td></tr>
+        <tr><td>5</td><td>The place where the store lives changed in the settings file</td><td>Caught: the settings file had changed</td></tr>
+        <tr><td>6</td><td>A setting pointed at a folder holding an old export</td><td>Caught: the saved-file fingerprint</td></tr>
+        <tr><td>7</td><td>The file that records the run state set back to an earlier state</td><td class="miss">Missed. Nothing checks that file yet</td></tr>
+        <tr><td>8</td><td>Two settings added to the data tool's project file</td><td>Caught: the file had changed</td></tr>
+        <tr><td>9</td><td>Old package versions written into the version list</td><td>Caught: the file had changed</td></tr>
+        <tr><td>10</td><td>The "latest row wins" rule flipped in a data tool macro</td><td>Caught, but only at the test step, after the copy and the build had run</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Result: 9 of 10 caught, 1 missed.</strong> Two more mistakes were planted and not scored. One repeated a mistake from an earlier test. The other came after the tenth. Both were caught.</p>
+
+  <h2>What this does not show</h2>
+  <ul class="pp-list">
+    <li>Six of the nine catches are the same kind: a file changed and nobody signed it. A change that someone signs without reading gets through.</li>
+    <li>A few places are not fully guarded yet: the file that records the run state, a profile file of the data tool, extra model files and some environment settings. Some changes there were caught late or not at all.</li>
+    <li>A few changes stop only at the test step, after the copy and the build have run.</li>
+    <li>It was one tester's set of ideas on made-up data. We did not test real business data or real apps.</li>
+    <li>Deciding whether a mistake repeats an earlier one is a judgement call.</li>
+  </ul>
+
+  <h2>How we got here</h2>
+  <p>Before these checks existed, a first test of this kind caught 5 of 10 mistakes. We then added the checks. Two later tests did not meet our bar of 9 of 10. In one, several planted mistakes repeated earlier ones. In the other, a version list was not checked. We closed that gap and ran a third test. That third test is the one above.</p>
+  <p>Kepthold works today on made-up sample records. No real app is connected yet.</p>
+  <p class="pp-back"><a class="btn" href="mailto:hello@kepthold.com">Email us to hear when it is ready</a> <a href="./">Back to the front page</a></p>
+</main>
+
+<footer class="foot wrap">
+  <a class="brand sm" href="./" aria-label="Kepthold, front page"><img src="assets/mark.svg" width="24" height="24" alt=""><span>Kepthold</span></a>
+  <a class="f-mail" href="mailto:hello@kepthold.com">hello@kepthold.com</a>
+  <p class="f-note">Every name and number on this page is made-up sample data.</p>
+</footer>
+</body>
+</html>

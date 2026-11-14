@@ -354,3 +354,18 @@ html:not(.js) .on-word { display: inline; color: var(--deep); }
   .foot { flex-direction: column; align-items: flex-start; }
 }
 @keyframes tearm { 0% { transform: none; opacity: 1; } 25% { transform: translate(0, 3px) rotate(-.6deg); opacity: 1; } 70% { opacity: 0; } 100% { transform: translate(0, 38px) rotate(-1.5deg); opacity: 0; } }
+
+/* proof page and 404 */
+.pp { padding-top: var(--s5); padding-bottom: var(--s5); max-width: 760px; }
+.pp h1 { font: 800 clamp(30px, 4.4vw, 52px)/1.1 var(--serif); letter-spacing: -0.014em; }
+.pp h2 { margin-top: var(--s5); font: 650 clamp(24px, 2.6vw, 32px)/1.2 var(--serif); }
+.pp p, .pp li { margin-top: var(--s2); font-size: 18px; line-height: 1.55; }
+.pp-lead { font-size: 20px; color: var(--muted); }
+.pp-list { padding-left: 1.2em; }
+.pp-table { margin-top: var(--s3); overflow-x: auto; }
+.pp-table table { width: 100%; border-collapse: collapse; font-size: 16px; }
+.pp-table th { text-align: left; font-size: 14px; font-weight: 600; color: var(--muted); padding: 8px 12px 8px 0; border-bottom: 1.5px solid var(--ink); }
+.pp-table td { padding: 12px 12px 12px 0; border-bottom: 1px solid #E1E6E2; vertical-align: top; }
+.pp-table td:first-child { width: 2em; }
+.pp-table .miss { font-weight: 700; }
+.pp-back { margin-top: var(--s4); display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
