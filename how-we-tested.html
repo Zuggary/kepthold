@@ -39,14 +39,14 @@
       <tbody>
         <tr><td>1</td><td>Freight amounts rounded to one decimal in a file that fetches orders</td><td>Caught: the file had changed and was not signed</td></tr>
         <tr><td>2</td><td>Open orders marked as shipped by filling a missing ship date</td><td>Caught: the same file check</td></tr>
-        <tr><td>3</td><td>An older, shorter copy of a saved app file put in before the first copy run</td><td>Caught: the saved-file fingerprint</td></tr>
-        <tr><td>4</td><td>An older copy of another saved file swapped in after a good run</td><td>Caught: the saved-file fingerprint</td></tr>
+        <tr><td>3</td><td>An older, shorter copy of a saved app file put in before the first copy run</td><td>Caught: the saved-file check</td></tr>
+        <tr><td>4</td><td>An older copy of another saved file swapped in after a good run</td><td>Caught: the saved-file check</td></tr>
         <tr><td>5</td><td>The place where the store lives changed in the settings file</td><td>Caught: the settings file had changed</td></tr>
-        <tr><td>6</td><td>A setting pointed at a folder holding an old export</td><td>Caught: the saved-file fingerprint</td></tr>
-        <tr><td>7</td><td>The file that records the run state set back to an earlier state</td><td class="miss">Missed. Nothing checks that file yet</td></tr>
-        <tr><td>8</td><td>Two settings added to the data tool's project file</td><td>Caught: the file had changed</td></tr>
-        <tr><td>9</td><td>Old package versions written into the version list</td><td>Caught: the file had changed</td></tr>
-        <tr><td>10</td><td>The "latest row wins" rule flipped in a data tool macro</td><td>Caught, but only at the test step, after the copy and the build had run</td></tr>
+        <tr><td>6</td><td>A setting pointed at a folder holding an old export</td><td>Caught: the saved-file check</td></tr>
+        <tr><td>7</td><td>The file where the program notes its own progress set back to an earlier point</td><td class="miss">Missed. Nothing checks that file yet</td></tr>
+        <tr><td>8</td><td>Two settings added to the data tool's settings file</td><td>Caught: the file had changed</td></tr>
+        <tr><td>9</td><td>Old software versions written into the list of versions it depends on</td><td>Caught: the file had changed</td></tr>
+        <tr><td>10</td><td>The "latest row wins" rule flipped in a rule file of the data tool</td><td>Caught, but only at the test step, after the copy and the build had run</td></tr>
       </tbody>
     </table>
   </div>
@@ -55,14 +55,14 @@
   <h2>What this does not show</h2>
   <ul class="pp-list">
     <li>Six of the nine catches are the same kind: a file changed and nobody signed it. A change that someone signs without reading gets through.</li>
-    <li>A few places are not fully guarded yet: the file that records the run state, a profile file of the data tool, extra model files and some environment settings. Some changes there were caught late or not at all.</li>
+    <li>A few places are not fully guarded yet: a file where the program notes its own progress, a settings file for one of its tools, extra files that add steps, and some computer settings. Some changes there were caught late or not at all.</li>
     <li>A few changes stop only at the test step, after the copy and the build have run.</li>
     <li>It was one tester's set of ideas on made-up data. We did not test real business data or real apps.</li>
     <li>Deciding whether a mistake repeats an earlier one is a judgement call.</li>
   </ul>
 
   <h2>How we got here</h2>
-  <p>Before these checks existed, a first test of this kind caught 5 of 10 mistakes. We then added the checks. Two later tests did not meet our bar of 9 of 10. In one, several planted mistakes repeated earlier ones. In the other, a version list was not checked. We closed that gap and ran a third test. That third test is the one above.</p>
+  <p>Before these checks existed, a first test of this kind caught 5 of 10 mistakes. We then added the checks. Two later tests did not meet our bar of 9 of 10. In one, several planted mistakes repeated earlier ones. In the other, a list of software versions was not checked. We closed that gap and ran a third test. That third test is the one above.</p>
   <p>Kepthold works today on made-up sample records. No real app is connected yet.</p>
   <p class="pp-back"><a class="btn" href="mailto:hello@kepthold.com">Email us to hear when it is ready</a> <a href="./">Back to the front page</a></p>
 </main>

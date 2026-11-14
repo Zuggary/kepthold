@@ -215,12 +215,12 @@
 <section class="promise checks wrap" aria-labelledby="h-checks">
   <div class="private">
     <h2 id="h-checks">It stops when a file it relies on changes</h2>
-    <p>Kepthold stops a copy run when a file that feeds your copy has changed and nobody signed the change. That covers the files that fetch your data, the settings, the saved files from your apps, the address it reads from and the package versions. In our test, 10 made-up mistakes of that kind were scored. It caught 9.</p>
-    <p class="proof">Proof: an independent test (job LH5) that scored 10 made-up mistakes on sample data. 9 caught. <a href="how-we-tested.html">Read how we tested it.</a></p>
+    <p>Kepthold stops a copy run when a file that feeds your copy has changed and nobody signed the change. That covers the files that fetch your data, the settings, the saved files from your apps, the address it reads from and the software versions it depends on. In our test, 10 made-up mistakes of that kind were scored. It caught 9.</p>
+    <p class="proof">How we checked this: a separate test scored 10 made-up mistakes on sample data. 9 were caught. <a href="how-we-tested.html">Read how we tested it.</a></p>
   </div>
   <div class="private">
     <h3>What it does not do</h3>
-    <p>Most of the catches are a changed file that was never signed, so a change you sign without reading gets through. A few places are not guarded yet: the file that records the run state, a profile file of the data tool, extra model files and some environment settings. A few changes stop only at the test step, after the copy.</p>
+    <p>Most of the catches are a changed file that was never signed, so a change you sign without reading gets through. A few places are not guarded yet: a file where the program notes its own progress, a settings file for one of its tools, extra files that add steps, and some computer settings. A few changes stop only at the test step, after the copy.</p>
   </div>
 </section>
 
