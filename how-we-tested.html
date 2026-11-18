@@ -19,23 +19,24 @@
 <link rel="preload" href="fonts/SchibstedGrotesk-VF.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">
 </head>
-<body>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="top wrap">
   <a class="brand" href="./" aria-label="Kepthold, front page"><img src="assets/mark.svg" width="28" height="28" alt=""><span>Kepthold</span></a>
   <a class="toplink" href="./">Front page</a>
 </header>
 
-<main id="top" class="wrap pp">
+<main id="main" tabindex="-1" class="wrap pp">
   <h1>How we tested the sync checks</h1>
   <p class="pp-lead">This page says what we tested, what the test caught and what it missed. Every file and number in the test is made-up sample data.</p>
 
   <h2>The test</h2>
   <p>Kepthold copies your records every night. The files and settings that do the copying are the part that can go wrong. So we asked a separate test agent, one that had not built the checks, to plant 12 realistic mistakes in those files. These are mistakes a careless person or a helpful program might call "a fix". A second, independent checker then scored the first 10 mistakes that differed from the ones in earlier tests. The checker also re-ran five of them itself.</p>
 
-  <h2>The 10 scored mistakes</h2>
-  <div class="pp-table" role="region" aria-label="The 10 scored mistakes" tabindex="0">
+  <h2 id="scored-mistakes">The 10 scored mistakes</h2>
+  <div class="pp-table" role="region" aria-labelledby="scored-mistakes" tabindex="0">
     <table>
-      <thead><tr><th>#</th><th>What was changed</th><th>Result</th></tr></thead>
+      <thead><tr><th scope="col">#</th><th scope="col">What was changed</th><th scope="col">Result</th></tr></thead>
       <tbody>
         <tr><td>1</td><td>Freight amounts rounded to one decimal in a file that fetches orders</td><td>Caught: the file had changed and was not signed</td></tr>
         <tr><td>2</td><td>Open orders marked as shipped by filling a missing ship date</td><td>Caught: the same file check</td></tr>
@@ -53,7 +54,7 @@
   <p><strong>Result: 9 of 10 caught, 1 missed.</strong> Two more mistakes were planted and not scored. One repeated a mistake from an earlier test. The other came after the tenth. Both were caught.</p>
 
   <h2>What this does not show</h2>
-  <ul class="pp-list">
+  <ul class="pp-list" role="list">
     <li>Six of the nine catches are the same kind: a file changed and nobody signed it. A change that someone signs without reading gets through.</li>
     <li>A few places are not fully guarded yet: a file where the program notes its own progress, a settings file for one of its tools, extra files that add steps, and some computer settings. Some changes there were caught late or not at all.</li>
     <li>A few changes stop only at the test step, after the copy and the build have run.</li>

@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.className='js';</script>
+<style>.js #static-example { display: none; }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kepthold: your business records, on a computer you own</title>
 <meta name="description" content="For owners who run a business on rented apps. Kepthold copies your invoices, bookings and payroll to a small computer in your office every night, and answers questions in plain words. It works today on made-up sample records.">
@@ -18,9 +20,10 @@
 <link rel="preload" href="fonts/Besley-VF.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/SchibstedGrotesk-VF.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">
-<script>document.documentElement.className='js';</script>
+<script src="site.js" defer></script>
 </head>
-<body>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
 <svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
   <symbol id="pc" viewBox="0 0 140 100">
     <ellipse cx="70" cy="93" rx="58" ry="5" fill="#16181D" opacity=".16"/>
@@ -47,10 +50,10 @@
 
 <header class="top wrap">
   <a class="brand" href="#top" aria-label="Kepthold, top of page"><img src="assets/mark.svg" width="28" height="28" alt=""><span>Kepthold</span></a>
-  <a class="toplink" href="#try">Try it</a>
+  <a class="toplink" href="#h-try">Try it</a>
 </header>
 
-<main id="top">
+<main id="main" tabindex="-1">
 
 <section class="hero wrap" aria-labelledby="h-hero">
   <h1 id="h-hero">Your business<br class="m"> records,<br class="d"> on a<br class="m"> computer you own.</h1>
@@ -63,14 +66,14 @@
   <figure class="duo" aria-label="Apps you rent are copied every night to Yours, your computer. You ask, and get the answer with the records behind it.">
     <div class="duo-rent g">
       <p class="cap">Apps you rent</p>
-      <ul class="apps"><li>Invoicing</li><li>Bookings</li><li>Payroll</li></ul>
+      <ul class="apps" role="list"><li>Invoicing</li><li>Bookings</li><li>Payroll</li></ul>
     </div>
-    <div class="duo-perf" aria-hidden="true"><span>every night</span></div>
+    <div class="duo-perf"><span>every night</span></div>
     <div class="duo-yours y">
       <div class="duo-head"><p class="cap">Yours</p><svg class="duo-pc" viewBox="0 0 140 100" aria-hidden="true"><use href="#pc"/></svg></div>
       <div class="slip-w"><div class="slip">
         <p class="slip-h">4 customers owe $6,320</p>
-        <ul class="mrecs">
+        <ul class="mrecs" role="list">
           <li><span>Northgate Plumbing</span><span>$2,940</span></li>
           <li><span>Harbour Lane Bakery</span><span>$1,860</span></li>
           <li><span>Riverside Dental</span><span>$1,040</span></li>
@@ -91,9 +94,9 @@
   <p class="night-cap">One made-up night and morning. The times are an example.</p>
   <div class="tl">
     <div class="tl-top">
-      <div class="mk mk-copy"><b class="tm">02:00</b></div>
-      <div class="mk mk-stop"><b class="tm">08:12</b><span class="desc">the invoicing app stops</span></div>
-      <div class="mk mk-ask"><b class="tm">08:14</b><span class="desc">you ask</span></div>
+      <div class="mk mk-copy"><time class="tm" datetime="02:00">02:00</time></div>
+      <div class="mk mk-stop"><time class="tm" datetime="08:12">08:12</time><span class="desc">the invoicing app stops</span></div>
+      <div class="mk mk-ask"><time class="tm" datetime="08:14">08:14</time><span class="desc">you ask</span></div>
     </div>
     <p class="brk"><span>kept on your computer</span></p>
     <ol class="caps">
@@ -105,7 +108,7 @@
 </section>
 
 <section class="try wrap" id="try" aria-labelledby="h-try">
-  <h2 id="h-try">Try it on sample records</h2>
+  <h2 id="h-try" tabindex="-1">Try it on sample records</h2>
   <p class="lead"><span class="js-only">This is a made-up business. Ask the question. Then switch the invoicing app off and ask again.</span><span class="nojs-only">This is a made-up business. Below, the same question twice: first with the invoicing app working, then with it switched off.</span></p>
 
   <div class="bench" id="bench" data-asked="1" data-open="1" data-off="0">
@@ -115,12 +118,12 @@
         <p class="app-name">Invoicing</p>
         <p class="app-state"><span class="st-on">Working</span><span class="st-off">Not responding since 08:12</span></p>
         <div class="power">
-          <button class="switch" type="button" role="switch" aria-checked="true" aria-label="Invoicing app power" id="sw"><span class="lab l-on">On</span><span class="lab l-off">Off</span><span class="knob"><span class="k-on">On</span><span class="k-off">Off</span></span></button>
+          <button class="switch" type="button" hidden role="switch" aria-checked="true" aria-label="Invoicing app power" id="sw"><span class="lab l-on">On</span><span class="lab l-off">Off</span><span class="knob"><span class="k-on">On</span><span class="k-off">Off</span></span></button>
           <span class="on-word">On</span>
         </div>
       </div>
       <div class="leaf" id="leaf"><div class="leaf-in g">
-        <ul class="inv">
+        <ul class="inv" role="list">
           <li class="inv-h"><span>Customer</span><span>Owed</span></li>
           <li><span>Northgate Plumbing</span><span class="amt">$2,940</span></li>
           <li><span>Harbour Lane Bakery</span><span class="amt">$1,860</span></li>
@@ -131,29 +134,30 @@
       <div class="yours y">
         <p class="zone">Your computer</p>
         <div class="q-row">
-          <div class="q-paper"><p class="q-text">Who owes us for more than 30 days?</p></div>
-          <button class="btn btn-ask" type="button" id="ask">Ask</button>
+          <div class="q-paper"><p class="q-text" id="sample-question">Who owes us for more than 30 days?</p></div>
+          <button class="btn btn-ask" type="button" hidden id="ask" aria-describedby="sample-question">Ask</button>
         </div>
-        <div class="answer" aria-live="polite">
+        <div id="answer-status" class="visually-hidden" role="status"></div>
+        <div class="answer">
           <div class="slip-w blank"><div class="slip"><p>Press Ask. Your answer prints here.</p></div></div>
           <div class="slip-w ans-w"><div class="slip ans-card">
             <p class="stamp"><span>Still answers, from last night's copy.</span></p>
             <p class="ans-big">4 customers owe $6,320.</p>
             <p class="ans-src"><span class="src-copy">From last night's copy. </span>Sample data.</p>
-            <button class="btn-rec" type="button" id="rec" aria-expanded="true" aria-controls="records"><span class="r-show">Show the records behind it</span><span class="r-hide">Hide the records</span></button>
+            <button class="btn-rec" type="button" hidden id="rec" aria-expanded="true" aria-controls="records"><span class="r-show">Show the records behind it</span><span class="r-hide">Hide the records</span></button>
             <div class="records" id="records">
               <div class="rec-in">
                 <table>
                   <caption>The records behind the answer</caption>
                   <colgroup><col class="c-cust"><col class="c-days"><col class="c-owed"></colgroup>
-                  <thead><tr><th scope="col">Customer</th><th scope="col">Days</th><th scope="col">Owed</th></tr></thead>
+                  <thead><tr><th scope="col" id="customer-1">Customer</th><th scope="col" id="days-1">Days</th><th scope="col" id="owed-1">Owed</th></tr></thead>
                   <tbody>
-                    <tr><td>Northgate Plumbing</td><td>47 days</td><td>$2,940</td></tr>
-                    <tr><td>Harbour Lane Bakery</td><td>38 days</td><td>$1,860</td></tr>
-                    <tr><td>Riverside Dental</td><td>33 days</td><td>$1,040</td></tr>
-                    <tr><td>Ashford Print Works</td><td>31 days</td><td>$480</td></tr>
+                    <tr><td headers="customer-1">Northgate Plumbing</td><td headers="days-1">47 days</td><td headers="owed-1">$2,940</td></tr>
+                    <tr><td headers="customer-1">Harbour Lane Bakery</td><td headers="days-1">38 days</td><td headers="owed-1">$1,860</td></tr>
+                    <tr><td headers="customer-1">Riverside Dental</td><td headers="days-1">33 days</td><td headers="owed-1">$1,040</td></tr>
+                    <tr><td headers="customer-1">Ashford Print Works</td><td headers="days-1">31 days</td><td headers="owed-1">$480</td></tr>
                   </tbody>
-                  <tfoot><tr><td>Total</td><td></td><td>$6,320</td></tr></tfoot>
+                  <tfoot><tr><td headers="customer-1">Total</td><td headers="days-1"></td><td headers="owed-1">$6,320</td></tr></tfoot>
                 </table>
               </div>
             </div>
@@ -162,9 +166,8 @@
       </div>
     </div>
   </div>
-  <script>(function(){var b=document.getElementById('bench');b.dataset.asked='0';b.dataset.open='0';document.getElementById('rec').setAttribute('aria-expanded','false');})();</script>
 
-  <noscript>
+  <div id="static-example">
     <div class="bench still-off" data-asked="1" data-open="1" data-off="1">
       <div class="pad2">
         <div class="stub g">
@@ -185,21 +188,21 @@
               <table>
                   <caption>The records behind the answer</caption>
                   <colgroup><col class="c-cust"><col class="c-days"><col class="c-owed"></colgroup>
-                  <thead><tr><th scope="col">Customer</th><th scope="col">Days</th><th scope="col">Owed</th></tr></thead>
+                  <thead><tr><th scope="col" id="customer-2">Customer</th><th scope="col" id="days-2">Days</th><th scope="col" id="owed-2">Owed</th></tr></thead>
                   <tbody>
-                    <tr><td>Northgate Plumbing</td><td>47 days</td><td>$2,940</td></tr>
-                    <tr><td>Harbour Lane Bakery</td><td>38 days</td><td>$1,860</td></tr>
-                    <tr><td>Riverside Dental</td><td>33 days</td><td>$1,040</td></tr>
-                    <tr><td>Ashford Print Works</td><td>31 days</td><td>$480</td></tr>
+                    <tr><td headers="customer-2">Northgate Plumbing</td><td headers="days-2">47 days</td><td headers="owed-2">$2,940</td></tr>
+                    <tr><td headers="customer-2">Harbour Lane Bakery</td><td headers="days-2">38 days</td><td headers="owed-2">$1,860</td></tr>
+                    <tr><td headers="customer-2">Riverside Dental</td><td headers="days-2">33 days</td><td headers="owed-2">$1,040</td></tr>
+                    <tr><td headers="customer-2">Ashford Print Works</td><td headers="days-2">31 days</td><td headers="owed-2">$480</td></tr>
                   </tbody>
-                  <tfoot><tr><td>Total</td><td></td><td>$6,320</td></tr></tfoot>
+                  <tfoot><tr><td headers="customer-2">Total</td><td headers="days-2"></td><td headers="owed-2">$6,320</td></tr></tfoot>
                 </table>
             </div></div>
           </div></div></div>
         </div>
       </div>
     </div>
-  </noscript>
+  </div>
 
   <p class="bad">On a bad day, if an app goes down, raises its price or shuts down, your copy answers with what it had last night.</p>
 </section>
@@ -243,6 +246,5 @@
   <a class="f-mail" href="mailto:hello@kepthold.com">hello@kepthold.com</a>
   <p class="f-note">Every name and number on this page is made-up sample data.</p>
 </footer>
-<script src="site.js" defer></script>
 </body>
 </html>
